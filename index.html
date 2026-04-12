@@ -768,31 +768,42 @@ function generateSPOCalendar(lang) {
 }
 
 // Returns 'dad' or 'mom' for school break days, or 'none' if not a break.
-// Spring/Winter breaks: split evenly, Mom gets first half, Dad second half.
-// Summer: handled separately via isDadSummerDay / isMomSummerDay.
+// Summer: handled via isDadSummerDay / isMomSummerDay (above).
+// Spring/Winter breaks: split evenly. Odd years → Mom first, Dad second. Even years → Dad first, Mom second.
 function getSchoolBreakCustody(dateStr) {
     const d = new Date(dateStr);
-    // RRISD Spring Break 2027: March 15-19
+    // ---- SPRING BREAK ----
+    // RRISD Spring Break 2027: March 15-19 (5 days, starts Mon)
     if (d >= new Date(2027, 2, 15) && d <= new Date(2027, 2, 19)) {
-        // 5 days: Mom gets 3 (Mon-Wed), Dad gets 2 (Thu-Fri)
+        // Odd year (2027): Mom first half (3 days Mon-Wed), Dad second half (2 days Thu-Fri)
         const dayOfBreak = Math.floor((d - new Date(2027, 2, 15)) / (1000*60*60*24));
-        return dayOfBreak < 3 ? 'mom' : 'dad';
+        return year % 2 === 1 ? (dayOfBreak < 3 ? 'mom' : 'dad') : (dayOfBreak < 2 ? 'dad' : 'mom');
     }
+    // ---- WINTER BREAK ----
     // RRISD Winter Break 2026-2027: Dec 18 - Jan 3 (17 days)
-    // Split: Mom gets Dec 18-25 (8 days), Dad gets Dec 26 - Jan 3 (9 days)
     const winStart = new Date(2026, 11, 18); // Dec 18
-    const winEnd = new Date(2027, 0, 3);      // Jan 3
+    const winEnd = new Date(2027, 0, 3);     // Jan 3
     if (d >= winStart && d <= winEnd) {
+        const totalDays = Math.floor((winEnd - winStart) / (1000*60*60*24)) + 1; // 17
+        const halfLen = Math.floor(totalDays / 2); // 8
         const dayOfBreak = Math.floor((d - winStart) / (1000*60*60*24));
-        return dayOfBreak < 8 ? 'mom' : 'dad';
+        // Even year (2026): Dad first half, Mom second half
+        return year % 2 === 0 ? (dayOfBreak < halfLen ? 'dad' : 'mom') : (dayOfBreak < halfLen ? 'mom' : 'dad');
     }
     return 'none';
 }
 
+// Mom's remaining summer days after Dad's 30 consecutive days.
+// Returns true for Mom's designated summer days per Texas §153.317 default.
+// Summer break is May 28 - Aug 16 (RRISD 2025-2026) / May 27 - Aug 15 (RRISD 2026-2027).
+// Dad's 30 days: July 1-30 each year. Mom gets July 31 through day before school starts.
 function isMomSummerDay(day, month, year) {
-    // Mom's remaining summer days: July 31 + Aug 1-2 (after Dad's 30 days)
-    if (month === 6 && day === 31) return true; // July 31
-    if (month === 7 && day >= 1 && day <= 2) return true; // Aug 1-2
+    // 2026: school starts Aug 3 → Mom gets July 31, Aug 1, Aug 2
+    if (year === 2026 && month === 6 && day === 31) return true; // July 31
+    if (year === 2026 && month === 7 && day >= 1 && day <= 2) return true; // Aug 1-2
+    // 2027: school starts Aug 16 → Mom gets July 31, Aug 1-15
+    if (year === 2027 && month === 6 && day === 31) return true; // July 31
+    if (year === 2027 && month === 7 && day >= 1 && day <= 15) return true; // Aug 1-15
     return false;
 }
 
