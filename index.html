@@ -173,12 +173,12 @@
                 <p id="calendarSubtitle" style="color:#aaa;margin-bottom:20px;">April 2026 - May 2027 | Blue = Dad | Red = Mom | Yellow = Holiday/No School</p>
 
                 <div class="cal-mode-tabs" style="display:flex;gap:10px;margin-bottom:20px;">
-                    <button class="nav-tab active" id="btnSpo" onclick="showCalMode('spo')" style="min-width:200px;">📅 SPO (Standard)</button>
-                    <button class="nav-tab" id="btnEspo" onclick="showCalMode('espo')" style="min-width:200px;">🌟 ESPO (Extended)</button>
+                    <button class="nav-tab" id="btnSpo" onclick="showCalMode('spo')" style="min-width:200px;">📅 SPO (Standard)</button>
+                    <button class="nav-tab active" id="btnEspo" onclick="showCalMode('espo')" style="min-width:200px;">🌟 ESPO (Extended)</button>
                 </div>
 
-                <div id="spoContainer" class="cal-container"></div>
-                <div id="espoContainer" class="cal-container" style="display:none;"></div>
+                <div id="spoContainer" class="cal-container" style="display:none;"></div>
+                <div id="espoContainer" class="cal-container"></div>
 
                 <div class="legend">
                     <div class="legend-item"><div class="legend-color dad-blue"></div><span id="legendDad">Dad</span></div>
@@ -663,25 +663,39 @@ function generateESPOCalendar(lang) {
         const lastDay = new Date(year, month + 1, 0);
         const startPad = firstDay.getDay();
         const thursdays = getWeekdayOccurrence(year, month, 4);
+        // Set of dates (day numbers) that are ESPO Thursdays (1st/3rd/5th week)
+        const espothuSet = new Set(thursdays.filter(t => isESPOWeek(t.occurrence)).map(t => t.date));
         for (let i = 0; i < startPad; i++) { const empty = document.createElement('div'); empty.className = 'cal-day other-month'; empty.innerHTML = '<div class="day-num"></div>'; daysDiv.appendChild(empty); }
         for (let d = 1; d <= lastDay.getDate(); d++) {
-            const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            const dow = new Date(year, month, d).getDay();
+            const dow = new Date(year, month, d).getDay(); // 0=Sun,1=Mon,...,6=Sat
             const dayDiv = document.createElement('div'); dayDiv.className = 'cal-day';
             const numDiv = document.createElement('div'); numDiv.className = 'day-num'; numDiv.textContent = d; dayDiv.appendChild(numDiv);
             const labelDiv = document.createElement('div'); labelDiv.className = 'day-label'; dayDiv.appendChild(labelDiv);
+            const dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
             const breakInfo = isSchoolBreak(dateStr);
             const isHoliday = breakInfo !== null;
-            const thursdayInfo = thursdays.find(t => t.date === d);
-            const isESPO = thursdayInfo && isESPOWeek(thursdayInfo.occurrence);
-            const isThursday = dow === 4;
-            // Summer break — Dad gets 30 consecutive days (marked purple)
-            if (isHoliday && !isESPO && !isThursday) {
+            // Compute Monday of this week
+            const mondayOfWeek = new Date(year, month, d);
+            mondayOfWeek.setDate(d - (dow === 0 ? 6 : dow - 1));
+            // Thursday of this week = Monday + 3
+            const thursdayOfWeek = new Date(mondayOfWeek);
+            thursdayOfWeek.setDate(mondayOfWeek.getDate() + 3);
+            const thuOfWeek = thursdayOfWeek.getDate();
+            const thursdayOfWeekMonth = thursdayOfWeek.getMonth();
+            const thursdayOfWeekYear = thursdayOfWeek.getFullYear();
+            // Is this Thursday an ESPO Thursday in this same month?
+            const isThuOfWeekESPO = thursdayOfWeekMonth === month && thursdayOfWeekYear === year && espothuSet.has(thuOfWeek);
+            // ESPO: Thu+Fri+Sat+Sun of an ESPO week (Mon AM dropoff => Mom resumes Monday morning)
+            const isThursday = dow === 4, isFriday = dow === 5, isSaturday = dow === 6, isSunday = dow === 0;
+            const isESPOWeekDay = isThuOfWeekESPO && (isThursday || isFriday || isSaturday || isSunday);
+            if (isHoliday && !isESPOWeekDay) {
                 dayDiv.classList.add('holiday');
                 labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
-            } else if (isESPO || isThursday) {
+            } else if (isESPOWeekDay) {
                 dayDiv.classList.add('dad');
-                labelDiv.textContent = lang === 'cn' ? '爸爸' : 'Dad';
+                if (isThursday) labelDiv.textContent = lang === 'cn' ? '爸爸' : 'Dad-Thu';
+                else if (isSunday) labelDiv.textContent = lang === 'cn' ? '爸爸(周一开始)' : 'Dad-Sun';
+                else labelDiv.textContent = lang === 'cn' ? '爸爸' : 'Dad';
             } else {
                 dayDiv.classList.add('mom');
             }
@@ -762,6 +776,7 @@ function setLanguage(lang) {
 
     generateSPOCalendar(lang);
     generateESPOCalendar(lang);
+    showCalMode("espo");
 }
 
 function showSection(section) {
