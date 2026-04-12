@@ -76,21 +76,18 @@
         .cal-day .day-num { font-weight: bold; margin-bottom: 2px; }
         .cal-day .day-label { font-size: 0.65rem; opacity: 0.8; line-height: 1.2; }
 
-        .cal-day.dad-standard { background: rgba(77,150,255,0.25); border: 1px solid rgba(77,150,255,0.5); }
-        .cal-day.dad-espo { background: rgba(77,150,255,0.4); border: 2px solid #4d96ff; }
-        .cal-day.mom { background: rgba(255,107,107,0.2); }
-        .cal-day.shared { background: rgba(107,203,119,0.2); }
-        .cal-day.holiday { background: rgba(255,217,61,0.3); }
-        .cal-day.weekend { background: rgba(255,255,255,0.05); }
-
+        .cal-day.dad { background: rgba(77,150,255,0.35); border: 1px solid rgba(77,150,255,0.6); }
+        .cal-day.mom { background: rgba(255,107,107,0.25); }
+        .cal-day.holiday { background: rgba(255,217,61,0.35); }
+        .cal-day.summer-dad { background: rgba(155,89,232,0.4); border: 2px solid rgba(155,89,232,0.7); }
+        
         .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; }
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
         .legend-color { width: 20px; height: 20px; border-radius: 4px; }
-        .legend-color.dad-standard { background: rgba(77,150,255,0.5); border: 1px solid rgba(77,150,255,0.8); }
-        .legend-color.dad-espo { background: rgba(77,150,255,0.7); border: 2px solid #4d96ff; }
-        .legend-color.mom { background: rgba(255,107,107,0.4); }
-        .legend-color.shared { background: rgba(107,203,119,0.4); }
-        .legend-color.holiday { background: rgba(255,217,61,0.5); }
+        .legend-color.dad-blue { background: rgba(77,150,255,0.7); border: 1px solid rgba(77,150,255,0.9); }
+        .legend-color.mom-red { background: rgba(255,107,107,0.5); }
+        .legend-color.holiday-yellow { background: rgba(255,217,61,0.5); }
+        .legend-color.summer-purple { background: rgba(155,89,232,0.5); border: 1px solid rgba(155,89,232,0.7); }
 
         /* Schedule */
         .schedule-block { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
@@ -158,7 +155,7 @@
 
                 <div class="schedule-block">
                     <h3 id="extendedTimeTitle">Extended Possession (ESPO)</h3>
-                    <p id="extendedDad">Father: 1st, 3rd, 5th week Thu off-school – Mon morning school dropoff + 30 days summer</p>
+                    <p id="extendedDad">Father: 1st, 3rd, 5th week Thu off-school - Mon morning school dropoff + 30 days summer</p>
                     <p id="extendedMom" style="margin-top:8px;">Mother: Remainder of time</p>
                 </div>
 
@@ -172,17 +169,22 @@
         <!-- Calendar Section -->
         <div class="section" id="section-calendar">
             <div class="card">
-                <h2 id="calendarTitle">RRISD Calendar - Custody Schedule</h2>
-                <p id="calendarSubtitle" style="color:#aaa;margin-bottom:20px;">April 2026 - May 2027 | Blue = Dad's time | Red = Mom's time | Yellow = Holiday/No School</p>
+                <h2 id="calendarTitle">RRISD Custody Calendars</h2>
+                <p id="calendarSubtitle" style="color:#aaa;margin-bottom:20px;">April 2026 - May 2027 | Blue = Dad | Red = Mom | Yellow = Holiday/No School</p>
 
-                <div id="calendarContainer"></div>
+                <div class="cal-mode-tabs" style="display:flex;gap:10px;margin-bottom:20px;">
+                    <button class="nav-tab active" id="btnSpo" onclick="showCalMode('spo')" style="min-width:200px;">📅 SPO (Standard)</button>
+                    <button class="nav-tab" id="btnEspo" onclick="showCalMode('espo')" style="min-width:200px;">🌟 ESPO (Extended)</button>
+                </div>
+
+                <div id="spoContainer" class="cal-container"></div>
+                <div id="espoContainer" class="cal-container" style="display:none;"></div>
 
                 <div class="legend">
-                    <div class="legend-item"><div class="legend-color dad-standard"></div><span id="legendDadStd">Dad: Thu 6-8pm (Standard)</span></div>
-                    <div class="legend-item"><div class="legend-color dad-espo"></div><span id="legendDadEspo">Dad: ESPO (1st/3rd/5th Thu – Mon AM)</span></div>
-                    <div class="legend-item"><div class="legend-color mom"></div><span id="legendMom">Mom (primary residence)</span></div>
-                    <div class="legend-item"><div class="legend-color shared"></div><span id="legendShared">School / Shared</span></div>
-                    <div class="legend-item"><div class="legend-color holiday"></div><span id="legendHoliday">Holiday / No School</span></div>
+                    <div class="legend-item"><div class="legend-color dad-blue"></div><span id="legendDad">Dad</span></div>
+                    <div class="legend-item"><div class="legend-color mom-red"></div><span id="legendMom">Mom</span></div>
+                    <div class="legend-item"><div class="legend-color holiday-yellow"></div><span id="legendHoliday">Holiday / No School</span></div>
+                    <div class="legend-item"><div class="legend-color summer-purple"></div><span id="legendSummer">Summer (Dad 30 days)</span></div>
                 </div>
             </div>
         </div>
@@ -482,7 +484,7 @@ const i18n = {
         standardDad: '父亲:每周四下午 6:00 - 8:00',
         standardMom: '母亲:其他所有时间(主要居住地)',
         extendedTimeTitle: '扩展探视 (ESPO)',
-        extendedDad: '父亲：每月第1、3、5周周四放学后 – 周一早上送孩子上学 + 夏季30天',
+        extendedDad: '父亲:每月第1、3、5周周四放学后 - 周一早上送孩子上学 + 夏季30天',
         extendedMom: '母亲:其余时间',
         holidaysTitle: '节假日安排',
         holidaysDesc: '轮流过节 - 详见日历。RRISD 2025-2026 和 2026-2027 校历。',
@@ -586,118 +588,107 @@ function isESPOWeek(thursdayOccurrence) {
     return thursdayOccurrence === 1 || thursdayOccurrence === 3 || thursdayOccurrence === 5;
 }
 
-function generateCalendar(lang) {
-    const container = document.getElementById('calendarContainer');
+function showCalMode(mode) {
+    document.getElementById('spoContainer').style.display = mode === 'spo' ? 'block' : 'none';
+    document.getElementById('espoContainer').style.display = mode === 'espo' ? 'block' : 'none';
+    document.getElementById('btnSpo').classList.toggle('active', mode === 'spo');
+    document.getElementById('btnEspo').classList.toggle('active', mode === 'espo');
+}
+
+// SPO Calendar: Standard Possession — every Thursday 6-8pm Dad, everything else Mom
+function generateSPOCalendar(lang) {
+    const container = document.getElementById('spoContainer');
     container.innerHTML = '';
-
-    const dayNames = getDayName(lang);
     const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-    // Generate months from April 2026 to May 2027
-    const startYear = 2026, startMonth = 3; // April 2026
-    const endYear = 2027, endMonth = 4; // May 2027
-
+    const startYear = 2026, startMonth = 3;
+    const endYear = 2027, endMonth = 4;
     let year = startYear, month = startMonth;
-    let rowDiv = null;
-    let monthCount = 0;
-
+    let rowDiv = null, monthCount = 0;
     while (year < endYear || (year === endYear && month <= endMonth)) {
-        if (monthCount % 3 === 0) {
-            rowDiv = document.createElement('div');
-            rowDiv.className = 'calendar-row';
-            container.appendChild(rowDiv);
-        }
-
-        const calDiv = document.createElement('div');
-        calDiv.className = 'month-calendar';
-
-        // Month header
-        const h3 = document.createElement('h3');
-        h3.textContent = getMonthName(year, month, lang);
-        calDiv.appendChild(h3);
-
-        // Weekday headers
-        const wdDiv = document.createElement('div');
-        wdDiv.className = 'cal-weekdays';
-        for (let i = 0; i < 7; i++) {
-            const wd = document.createElement('div');
-            wd.className = 'cal-weekday';
-            wd.textContent = weekdays[i];
-            wdDiv.appendChild(wd);
-        }
+        if (monthCount % 3 === 0) { rowDiv = document.createElement('div'); rowDiv.className = 'calendar-row'; container.appendChild(rowDiv); }
+        const calDiv = document.createElement('div'); calDiv.className = 'month-calendar';
+        const h3 = document.createElement('h3'); h3.textContent = getMonthName(year, month, lang); calDiv.appendChild(h3);
+        const wdDiv = document.createElement('div'); wdDiv.className = 'cal-weekdays';
+        for (let i = 0; i < 7; i++) { const wd = document.createElement('div'); wd.className = 'cal-weekday'; wd.textContent = weekdays[i]; wdDiv.appendChild(wd); }
         calDiv.appendChild(wdDiv);
-
-        // Days grid
-        const daysDiv = document.createElement('div');
-        daysDiv.className = 'cal-days';
-
+        const daysDiv = document.createElement('div'); daysDiv.className = 'cal-days';
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const startPad = firstDay.getDay();
-
-        // Get Thursday occurrences for this month
-        const thursdays = getWeekdayOccurrence(year, month, 4); // Thursday = 4
-
-        // Pad beginning
-        for (let i = 0; i < startPad; i++) {
-            const empty = document.createElement('div');
-            empty.className = 'cal-day other-month';
-            empty.innerHTML = '<div class="day-num"></div>';
-            daysDiv.appendChild(empty);
-        }
-
-        // Days
+        for (let i = 0; i < startPad; i++) { const empty = document.createElement('div'); empty.className = 'cal-day other-month'; empty.innerHTML = '<div class="day-num"></div>'; daysDiv.appendChild(empty); }
         for (let d = 1; d <= lastDay.getDate(); d++) {
             const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-            const dayOfWeek = new Date(year, month, d).getDay();
-
-            const dayDiv = document.createElement('div');
-            dayDiv.className = 'cal-day';
-
-            const numDiv = document.createElement('div');
-            numDiv.className = 'day-num';
-            numDiv.textContent = d;
-            dayDiv.appendChild(numDiv);
-
-            const labelDiv = document.createElement('div');
-            labelDiv.className = 'day-label';
-            dayDiv.appendChild(labelDiv);
-
-            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-            const isThursday = (dayOfWeek === 4);
+            const dow = new Date(year, month, d).getDay();
+            const dayDiv = document.createElement('div'); dayDiv.className = 'cal-day';
+            const numDiv = document.createElement('div'); numDiv.className = 'day-num'; numDiv.textContent = d; dayDiv.appendChild(numDiv);
+            const labelDiv = document.createElement('div'); labelDiv.className = 'day-label'; dayDiv.appendChild(labelDiv);
             const breakInfo = isSchoolBreak(dateStr);
             const isHoliday = breakInfo !== null;
-
-            // Check if this Thursday is ESPO (1st, 3rd, 5th occurrence)
-            const thursdayInfo = thursdays.find(t => t.date === d);
-            const isESPO = thursdayInfo && isESPOWeek(thursdayInfo.occurrence);
-
+            const isThursday = dow === 4;
             if (isThursday) {
-                if (isESPO) {
-                    dayDiv.classList.add('dad-espo');
-                    labelDiv.textContent = lang === 'cn' ? '爸爸ESPO' : 'Dad ESPO';
-                } else if (isHoliday) {
-                    dayDiv.classList.add('dad-espo');
-                    labelDiv.textContent = lang === 'cn' ? '爸爸ESPO' : 'Dad ESPO';
-                } else {
-                    dayDiv.classList.add('dad-standard');
-                    labelDiv.textContent = lang === 'cn' ? '爸爸6-8点' : 'Dad 6-8pm';
-                }
+                dayDiv.classList.add('dad');
+                labelDiv.textContent = lang === 'cn' ? '爸爸6-8pm' : 'Dad 6-8pm';
             } else if (isHoliday) {
                 dayDiv.classList.add('holiday');
-                labelDiv.textContent = breakInfo.label[lang] || breakInfo.label.en;
-            } else if (isWeekend) {
-                dayDiv.classList.add('weekend');
+                labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
+            } else {
+                dayDiv.classList.add('mom');
             }
-
             daysDiv.appendChild(dayDiv);
         }
+        calDiv.appendChild(daysDiv); rowDiv.appendChild(calDiv);
+        month++; monthCount++;
+        if (month > 11) { month = 0; year++; }
+    }
+}
 
-        calDiv.appendChild(daysDiv);
-        rowDiv.appendChild(calDiv);
-
-        month++;
-        monthCount++;
+// ESPO Calendar: Extended Possession — 1st/3rd/5th Thu off-school to Mon AM = Dad, everything else = Mom
+function generateESPOCalendar(lang) {
+    const container = document.getElementById('espoContainer');
+    container.innerHTML = '';
+    const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const startYear = 2026, startMonth = 3;
+    const endYear = 2027, endMonth = 4;
+    let year = startYear, month = startMonth;
+    let rowDiv = null, monthCount = 0;
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+        if (monthCount % 3 === 0) { rowDiv = document.createElement('div'); rowDiv.className = 'calendar-row'; container.appendChild(rowDiv); }
+        const calDiv = document.createElement('div'); calDiv.className = 'month-calendar';
+        const h3 = document.createElement('h3'); h3.textContent = getMonthName(year, month, lang); calDiv.appendChild(h3);
+        const wdDiv = document.createElement('div'); wdDiv.className = 'cal-weekdays';
+        for (let i = 0; i < 7; i++) { const wd = document.createElement('div'); wd.className = 'cal-weekday'; wd.textContent = weekdays[i]; wdDiv.appendChild(wd); }
+        calDiv.appendChild(wdDiv);
+        const daysDiv = document.createElement('div'); daysDiv.className = 'cal-days';
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startPad = firstDay.getDay();
+        const thursdays = getWeekdayOccurrence(year, month, 4);
+        for (let i = 0; i < startPad; i++) { const empty = document.createElement('div'); empty.className = 'cal-day other-month'; empty.innerHTML = '<div class="day-num"></div>'; daysDiv.appendChild(empty); }
+        for (let d = 1; d <= lastDay.getDate(); d++) {
+            const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const dow = new Date(year, month, d).getDay();
+            const dayDiv = document.createElement('div'); dayDiv.className = 'cal-day';
+            const numDiv = document.createElement('div'); numDiv.className = 'day-num'; numDiv.textContent = d; dayDiv.appendChild(numDiv);
+            const labelDiv = document.createElement('div'); labelDiv.className = 'day-label'; dayDiv.appendChild(labelDiv);
+            const breakInfo = isSchoolBreak(dateStr);
+            const isHoliday = breakInfo !== null;
+            const thursdayInfo = thursdays.find(t => t.date === d);
+            const isESPO = thursdayInfo && isESPOWeek(thursdayInfo.occurrence);
+            const isThursday = dow === 4;
+            // Summer break — Dad gets 30 consecutive days (marked purple)
+            if (isHoliday && !isESPO && !isThursday) {
+                dayDiv.classList.add('holiday');
+                labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
+            } else if (isESPO || isThursday) {
+                dayDiv.classList.add('dad');
+                labelDiv.textContent = lang === 'cn' ? '爸爸' : 'Dad';
+            } else {
+                dayDiv.classList.add('mom');
+            }
+            daysDiv.appendChild(dayDiv);
+        }
+        calDiv.appendChild(daysDiv); rowDiv.appendChild(calDiv);
+        month++; monthCount++;
         if (month > 11) { month = 0; year++; }
     }
 }
@@ -761,7 +752,16 @@ function setLanguage(lang) {
     document.getElementById('footerText').textContent = t.footerText;
     document.documentElement.lang = lang;
 
-    generateCalendar(lang);
+    // Update calendar mode buttons
+    document.getElementById('btnSpo').textContent = (lang === 'cn' ? '📅 SPO 标准探视' : '📅 SPO (Standard)');
+    document.getElementById('btnEspo').textContent = (lang === 'cn' ? '🌟 ESPO 扩展探视' : '🌟 ESPO (Extended)');
+    document.getElementById('legendDad').textContent = (lang === 'cn' ? '爸爸' : 'Dad');
+    document.getElementById('legendMom').textContent = (lang === 'cn' ? '妈妈' : 'Mom');
+    document.getElementById('legendHoliday').textContent = (lang === 'cn' ? '放假/不上课' : 'Holiday / No School');
+    document.getElementById('legendSummer').textContent = (lang === 'cn' ? '夏季(爸爸30天)' : 'Summer (Dad 30 days)');
+
+    generateSPOCalendar(lang);
+    generateESPOCalendar(lang);
 }
 
 function showSection(section) {
