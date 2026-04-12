@@ -13,7 +13,7 @@
             color: #fff;
         }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        
+
         .lang-toggle { display: flex; justify-content: flex-end; gap: 10px; padding: 20px; }
         .lang-btn {
             padding: 8px 20px; border: 2px solid rgba(255,255,255,0.2);
@@ -21,13 +21,13 @@
             cursor: pointer; font-size: 0.9rem; transition: all 0.3s;
         }
         .lang-btn.active { border-color: #4d96ff; background: rgba(77,150,255,0.2); }
-        
+
         h1 {
             text-align: center; font-size: 2.5rem;
             background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px;
         }
-        
+
         .nav-tabs { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
         .nav-tab {
             padding: 12px 24px; background: rgba(255,255,255,0.05);
@@ -36,16 +36,16 @@
         }
         .nav-tab.active { border-color: #4d96ff; background: rgba(77,150,255,0.2); }
         .nav-tab:hover { border-color: #4d96ff; }
-        
+
         .section { display: none; }
         .section.active { display: block; }
-        
+
         .card {
             background: rgba(255,255,255,0.05); border-radius: 16px; padding: 30px;
             margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1);
         }
         .card h2 { color: #ffd93d; margin-bottom: 20px; font-size: 1.5rem; }
-        
+
         /* Real Calendar Grid */
         .calendar-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 30px; }
         .month-calendar {
@@ -75,14 +75,14 @@
         .cal-day.other-month { opacity: 0.3; }
         .cal-day .day-num { font-weight: bold; margin-bottom: 2px; }
         .cal-day .day-label { font-size: 0.65rem; opacity: 0.8; line-height: 1.2; }
-        
+
         .cal-day.dad-standard { background: rgba(77,150,255,0.25); border: 1px solid rgba(77,150,255,0.5); }
         .cal-day.dad-espo { background: rgba(77,150,255,0.4); border: 2px solid #4d96ff; }
         .cal-day.mom { background: rgba(255,107,107,0.2); }
         .cal-day.shared { background: rgba(107,203,119,0.2); }
         .cal-day.holiday { background: rgba(255,217,61,0.3); }
         .cal-day.weekend { background: rgba(255,255,255,0.05); }
-        
+
         .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; }
         .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
         .legend-color { width: 20px; height: 20px; border-radius: 4px; }
@@ -91,12 +91,12 @@
         .legend-color.mom { background: rgba(255,107,107,0.4); }
         .legend-color.shared { background: rgba(107,203,119,0.4); }
         .legend-color.holiday { background: rgba(255,217,61,0.5); }
-        
+
         /* Schedule */
         .schedule-block { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; margin-bottom: 15px; }
         .schedule-block h3 { color: #4d96ff; margin-bottom: 10px; font-size: 1rem; }
         .schedule-block p { color: #ccc; font-size: 0.9rem; line-height: 1.6; }
-        
+
         /* Expenses */
         .expense-category { margin-bottom: 25px; }
         .expense-category h3 {
@@ -116,7 +116,7 @@
         .covered-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
         .covered-badge.yes { background: rgba(107,203,119,0.3); color: #6bcb77; }
         .covered-badge.maybe { background: rgba(255,217,61,0.3); color: #ffd93d; }
-        
+
         footer { text-align: center; padding: 30px; color: #666; font-size: 0.85rem; }
         @media (max-width: 768px) {
             h1 { font-size: 1.8rem; }
@@ -131,70 +131,70 @@
         <button class="lang-btn" data-lang="cn" onclick="setLanguage('cn')">🇨🇳 中文</button>
         <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">🇺🇸 English</button>
     </div>
-    
+
     <div class="container">
         <h1 id="mainTitle">Co-Parenting Portal</h1>
-        
+
         <div class="nav-tabs">
             <button class="nav-tab active" data-section="schedule" onclick="showSection('schedule')" id="tabSchedule">📅 Schedule</button>
             <button class="nav-tab" data-section="calendar" onclick="showSection('calendar')" id="tabCalendar">🗓️ Calendar</button>
             <button class="nav-tab" data-section="expenses" onclick="showSection('expenses')" id="tabExpenses">💰 Expenses</button>
-            <button class="nav-tab" data-section="info" onclick="showSection('info')" id="tabInfo">ℹ️ Info</button>
+            <button class="nav-tab" data-section="info" onclick="showSection('info')" id="tabInfo">i️ Info</button>
         </div>
-        
+
         <!-- Schedule Section -->
         <div class="section active" id="section-schedule">
             <div class="card">
                 <h2 id="scheduleTitle">ESPO Custody Schedule</h2>
                 <p id="scheduleDesc" style="color: #aaa; margin-bottom: 20px;">
-                    Extended Standard Possession Order — Texas Family Code §153.317
+                    Extended Standard Possession Order - Texas Family Code §153.317
                 </p>
-                
+
                 <div class="schedule-block">
                     <h3 id="standardTimeTitle">Standard Possession</h3>
-                    <p id="standardDad">Father: Every Thursday 6:00 PM – 8:00 PM</p>
+                    <p id="standardDad">Father: Every Thursday 6:00 PM - 8:00 PM</p>
                     <p id="standardMom" style="margin-top:8px;">Mother: All other times (primary residence)</p>
                 </div>
-                
+
                 <div class="schedule-block">
                     <h3 id="extendedTimeTitle">Extended Possession (ESPO)</h3>
-                    <p id="extendedDad">Father: 1st, 3rd, 5th week Thu 6 PM – Sun (off school) + 30 days summer</p>
+                    <p id="extendedDad">Father: 1st, 3rd, 5th week Thu off-school – Mon morning school dropoff + 30 days summer</p>
                     <p id="extendedMom" style="margin-top:8px;">Mother: Remainder of time</p>
                 </div>
-                
+
                 <div class="schedule-block">
                     <h3 id="holidaysTitle">Holiday Schedule</h3>
-                    <p id="holidaysDesc">Alternating holidays — see calendar for details. RRISD 2025-2026 and 2026-2027 calendars.</p>
+                    <p id="holidaysDesc">Alternating holidays - see calendar for details. RRISD 2025-2026 and 2026-2027 calendars.</p>
                 </div>
             </div>
         </div>
-        
+
         <!-- Calendar Section -->
         <div class="section" id="section-calendar">
             <div class="card">
-                <h2 id="calendarTitle">RRISD Calendar — Custody Schedule</h2>
-                <p id="calendarSubtitle" style="color:#aaa;margin-bottom:20px;">April 2026 – May 2027 | Blue = Dad's time | Red = Mom's time | Yellow = Holiday/No School</p>
-                
+                <h2 id="calendarTitle">RRISD Calendar - Custody Schedule</h2>
+                <p id="calendarSubtitle" style="color:#aaa;margin-bottom:20px;">April 2026 - May 2027 | Blue = Dad's time | Red = Mom's time | Yellow = Holiday/No School</p>
+
                 <div id="calendarContainer"></div>
-                
+
                 <div class="legend">
                     <div class="legend-item"><div class="legend-color dad-standard"></div><span id="legendDadStd">Dad: Thu 6-8pm (Standard)</span></div>
-                    <div class="legend-item"><div class="legend-color dad-espo"></div><span id="legendDadEspo">Dad: ESPO (1st/3rd/5th Thu + Sun)</span></div>
+                    <div class="legend-item"><div class="legend-color dad-espo"></div><span id="legendDadEspo">Dad: ESPO (1st/3rd/5th Thu – Mon AM)</span></div>
                     <div class="legend-item"><div class="legend-color mom"></div><span id="legendMom">Mom (primary residence)</span></div>
                     <div class="legend-item"><div class="legend-color shared"></div><span id="legendShared">School / Shared</span></div>
                     <div class="legend-item"><div class="legend-color holiday"></div><span id="legendHoliday">Holiday / No School</span></div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Expenses Section -->
         <div class="section" id="section-expenses">
             <div class="card">
-                <h2 id="expensesTitle">Texas Child Support — What's Covered</h2>
+                <h2 id="expensesTitle">Texas Child Support - What's Covered</h2>
                 <p id="expensesDesc" style="color:#aaa;margin-bottom:20px;">
                     Under Texas Family Code §154.001, child support covers basic necessities. Each item links to the relevant statute.
                 </p>
-                
+
                 <div class="expense-category">
                     <h3 id="catBasic">🏠 Basic Necessities</h3>
                     <div class="expense-item">
@@ -230,7 +230,7 @@
                         <span class="covered-badge yes">Covered</span>
                     </div>
                 </div>
-                
+
                 <div class="expense-category">
                     <h3 id="catEducation">📚 Education</h3>
                     <div class="expense-item">
@@ -266,7 +266,7 @@
                         <span class="covered-badge maybe">Case-by-Case</span>
                     </div>
                 </div>
-                
+
                 <div class="expense-category">
                     <h3 id="catMedical">🏥 Medical & Health</h3>
                     <div class="expense-item">
@@ -294,7 +294,7 @@
                         <span class="covered-badge yes">Covered</span>
                     </div>
                 </div>
-                
+
                 <div class="expense-category">
                     <h3 id="catActivities">🎭 Extracurricular & Social</h3>
                     <div class="expense-item">
@@ -338,7 +338,7 @@
                         <span class="covered-badge maybe">Case-by-Case</span>
                     </div>
                 </div>
-                
+
                 <div class="expense-category">
                     <h3 id="catOther">📋 Additional Expenses</h3>
                     <div class="expense-item">
@@ -360,7 +360,7 @@
                     <div class="expense-item">
                         <div>
                             <div class="expense-name" id="itemCollege">College Expenses</div>
-                            <div class="expense-desc" id="descCollege">After age 18 — separate agreement under §154.002</div>
+                            <div class="expense-desc" id="descCollege">After age 18 - separate agreement under §154.002</div>
                             <div class="expense-legal"><a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.002" target="_blank">Texas Family Code §154.002</a></div>
                         </div>
                         <span class="covered-badge maybe">Separate Agreement</span>
@@ -376,7 +376,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Info Section -->
         <div class="section" id="section-info">
             <div class="card">
@@ -391,19 +391,19 @@
                     <h3 id="infoResources">Resources</h3>
                     <div class="expense-item">
                         <div>
-                            <div class="expense-name">Texas Family Code — Child Support (Chapter 154)</div>
+                            <div class="expense-name">Texas Family Code - Child Support (Chapter 154)</div>
                             <div class="expense-legal"><a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm" target="_blank">Texas Family Code Chapter 154</a></div>
                         </div>
                     </div>
                     <div class="expense-item">
                         <div>
-                            <div class="expense-name">Texas Family Code — Possession & Access (Chapter 153)</div>
+                            <div class="expense-name">Texas Family Code - Possession & Access (Chapter 153)</div>
                             <div class="expense-legal"><a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.153.htm" target="_blank">Texas Family Code Chapter 153</a></div>
                         </div>
                     </div>
                     <div class="expense-item">
                         <div>
-                            <div class="expense-name">Texas State Law Library — Child Custody & Support</div>
+                            <div class="expense-name">Texas State Law Library - Child Custody & Support</div>
                             <div class="expense-legal"><a href="https://guides.sll.texas.gov/child-custody-and-support" target="_blank">guides.sll.texas.gov</a></div>
                         </div>
                     </div>
@@ -417,7 +417,7 @@
             </div>
         </div>
     </div>
-    
+
     <footer>
         <p id="footerText">Last updated: 2026-04-12 | For informational purposes only. Not legal advice.</p>
     </footer>
@@ -429,22 +429,22 @@ const i18n = {
     en: {
         mainTitle: 'Co-Parenting Portal',
         tabSchedule: '📅 Schedule', tabCalendar: '🗓️ Calendar',
-        tabExpenses: '💰 Expenses', tabInfo: 'ℹ️ Info',
+        tabExpenses: '💰 Expenses', tabInfo: 'i️ Info',
         scheduleTitle: 'ESPO Custody Schedule',
-        scheduleDesc: 'Extended Standard Possession Order — Texas Family Code §153.317',
+        scheduleDesc: 'Extended Standard Possession Order - Texas Family Code §153.317',
         standardTimeTitle: 'Standard Possession',
-        standardDad: 'Father: Every Thursday 6:00 PM – 8:00 PM',
+        standardDad: 'Father: Every Thursday 6:00 PM - 8:00 PM',
         standardMom: 'Mother: All other times (primary residence)',
         extendedTimeTitle: 'Extended Possession (ESPO)',
-        extendedDad: 'Father: 1st, 3rd, 5th week Thu 6 PM – Sun (off school) + 30 days summer',
+        extendedDad: 'Father: 1st, 3rd, 5th week Thu off-school - Mon AM dropoff + 30 days summer',
         extendedMom: 'Mother: Remainder of time',
         holidaysTitle: 'Holiday Schedule',
-        holidaysDesc: 'Alternating holidays — see calendar for details. RRISD 2025-2026 and 2026-2027 calendars.',
-        calendarTitle: 'RRISD Calendar — Custody Schedule',
-        calendarSubtitle: 'April 2026 – May 2027 | Blue = Dad time | Red = Mom time | Yellow = Holiday/No School',
-        legendDadStd: "Dad: Thu 6-8pm (Standard)", legendDadEspo: "Dad: ESPO (1st/3rd/5th Thu + Sun)",
+        holidaysDesc: 'Alternating holidays - see calendar for details. RRISD 2025-2026 and 2026-2027 calendars.',
+        calendarTitle: 'RRISD Calendar - Custody Schedule',
+        calendarSubtitle: 'April 2026 - May 2027 | Blue = Dad time | Red = Mom time | Yellow = Holiday/No School',
+        legendDadStd: "Dad: Thu 6-8pm (Standard)", legendDadEspo: "Dad: ESPO (1st/3rd/5th Thu - Mon AM)",
         legendMom: "Mom (primary residence)", legendShared: "School / Shared", legendHoliday: "Holiday / No School",
-        expensesTitle: 'Texas Child Support — What\'s Covered',
+        expensesTitle: 'Texas Child Support - What\'s Covered',
         expensesDesc: 'Under Texas Family Code §154.001, child support covers basic necessities. Each item links to the relevant statute.',
         catBasic: '🏠 Basic Necessities', catEducation: '📚 Education',
         catMedical: '🏥 Medical & Health', catActivities: '🎭 Extracurricular & Social', catOther: '📋 Additional Expenses',
@@ -466,7 +466,7 @@ const i18n = {
         itemGirlScouts: 'Girl Scouts / Boy Scouts', descGirlScouts: 'Dues, uniforms, badges, cookie sales support',
         itemDaycare: 'Daycare / After-School Care', descDaycare: 'Childcare to allow parent to maintain employment',
         itemTransportation: 'Transportation for Custody Exchanges', descTransportation: 'Driving between parents homes for visitation exchanges',
-        itemCollege: 'College Expenses', descCollege: 'After age 18 — separate agreement under §154.002',
+        itemCollege: 'College Expenses', descCollege: 'After age 18 - separate agreement under §154.002',
         itemSpecial: 'Special Needs / Extraordinary Expenses', descSpecial: 'Learning disabilities, chronic illness, special accommodations',
         infoTitle: 'Important Information', infoDisclaimer: 'Disclaimer',
         disclaimerText: 'This website provides general information only and does not constitute legal advice. Consult a licensed Texas family law attorney for specific legal guidance.',
@@ -475,48 +475,48 @@ const i18n = {
     cn: {
         mainTitle: '共同抚养门户',
         tabSchedule: '📅 时间表', tabCalendar: '🗓️ 日历',
-        tabExpenses: '💰 费用', tabInfo: 'ℹ️ 信息',
+        tabExpenses: '💰 费用', tabInfo: 'i️ 信息',
         scheduleTitle: 'ESPO 抚养时间表',
-        scheduleDesc: '扩展标准探视令 — 德州家庭法 §153.317',
+        scheduleDesc: '扩展标准探视令 - 德州家庭法 §153.317',
         standardTimeTitle: '标准探视',
-        standardDad: '父亲：每周四下午 6:00 – 8:00',
-        standardMom: '母亲：其他所有时间（主要居住地）',
+        standardDad: '父亲:每周四下午 6:00 - 8:00',
+        standardMom: '母亲:其他所有时间(主要居住地)',
         extendedTimeTitle: '扩展探视 (ESPO)',
-        extendedDad: '父亲：每月第1、3、5周周四下午6点 – 周日（学校放假）+ 夏季30天',
-        extendedMom: '母亲：其余时间',
+        extendedDad: '父亲：每月第1、3、5周周四放学后 – 周一早上送孩子上学 + 夏季30天',
+        extendedMom: '母亲:其余时间',
         holidaysTitle: '节假日安排',
-        holidaysDesc: '轮流过节 — 详见日历。RRISD 2025-2026 和 2026-2027 校历。',
-        calendarTitle: 'RRISD 校历 — 抚养时间表',
-        calendarSubtitle: '2026年4月 – 2027年5月 | 蓝色=爸爸时间 | 红色=妈妈时间 | 黄色=放假',
-        legendDadStd: "爸爸：周四6-8点（标准）", legendDadEspo: "爸爸：ESPO（第1/3/5周周四+周日）",
-        legendMom: "妈妈（主要居住地）", legendShared: "学校/共享", legendHoliday: "放假/不上课",
-        expensesTitle: '德州子女抚养费 — 涵盖项目',
-        expensesDesc: '根据德州家庭法 §154.001，抚养费涵盖基本必需品。每项都附有相关法律条款链接。',
+        holidaysDesc: '轮流过节 - 详见日历。RRISD 2025-2026 和 2026-2027 校历。',
+        calendarTitle: 'RRISD 校历 - 抚养时间表',
+        calendarSubtitle: '2026年4月 - 2027年5月 | 蓝色=爸爸时间 | 红色=妈妈时间 | 黄色=放假',
+        legendDadStd: "爸爸:周四6-8点(标准)", legendDadEspo: "爸爸:ESPO(第1/3/5周周四+周日)",
+        legendMom: "妈妈(主要居住地)", legendShared: "学校/共享", legendHoliday: "放假/不上课",
+        expensesTitle: '德州子女抚养费 - 涵盖项目',
+        expensesDesc: '根据德州家庭法 §154.001,抚养费涵盖基本必需品。每项都附有相关法律条款链接。',
         catBasic: '🏠 基本必需品', catEducation: '📚 教育',
         catMedical: '🏥 医疗健康', catActivities: '🎭 课外活动与社交', catOther: '📋 其他费用',
         itemShelter: '住房', descShelter: '租金、房贷、水电费、日常开支',
         itemFood: '食物与营养', descFood: '食品、日用品、学校午餐',
-        itemClothing: '服装（日常）', descClothing: '日常穿着、袜子、内衣、季节性服装',
-        itemShoes: '鞋子（日常）', descShoes: '日常鞋、运动鞋、凉鞋、袜子',
+        itemClothing: '服装(日常)', descClothing: '日常穿着、袜子、内衣、季节性服装',
+        itemShoes: '鞋子(日常)', descShoes: '日常鞋、运动鞋、凉鞋、袜子',
         itemSchoolBooks: '学校书本和用品', descSchoolBooks: '课本、笔记本、文具、书包、学校要求的学习用品',
         itemSchoolFees: '学校费用和活动/俱乐部', descSchoolFees: '俱乐部费、班级费、学校活动费、课外活动费',
         itemOutdoorSchool: '户外学校/实地考察/营地', descOutdoorSchool: '营地项目、学校组织的过夜实地考察',
         itemTutoring: '辅导', descTutoring: '需要时的学业支持',
         itemBasicMedical: '基本医疗', descBasicMedical: '就诊、疫苗、处方药',
         itemDental: '牙科护理', descDental: '常规检查、洗牙、基本牙科治疗',
-        itemHealthInsurance: '健康保险', descHealthInsurance: '保费（根据 §154.162 单独命令）',
+        itemHealthInsurance: '健康保险', descHealthInsurance: '保费(根据 §154.162 单独命令)',
         itemSports: '体育运动', descSports: '团队费用、设备、运动服、运动体检',
         itemMusic: '音乐艺术课', descMusic: '乐器课、美术课、各种课程',
-        itemBirthday: '生日派对礼物', descBirthday: '参加同学生日派对的礼物（社交发展）',
+        itemBirthday: '生日派对礼物', descBirthday: '参加同学生日派对的礼物(社交发展)',
         itemSummerCamp: '夏令营', descSummerCamp: '日营、过夜营、夏季项目',
         itemGirlScouts: '女童军/男童军', descGirlScouts: '会费、服装、徽章、饼干销售支持',
         itemDaycare: '日托/课后托管', descDaycare: '以便父母工作的儿童托管',
         itemTransportation: '探视交通费', descTransportation: '在父母住处之间开车探视',
-        itemCollege: '大学费用', descCollege: '18岁后 — 根据 §154.002 的单独协议',
+        itemCollege: '大学费用', descCollege: '18岁后 - 根据 §154.002 的单独协议',
         itemSpecial: '特殊需求/额外费用', descSpecial: '学习障碍、慢性病、特殊住宿需求',
         infoTitle: '重要信息', infoDisclaimer: '免责声明',
-        disclaimerText: '本网站仅提供一般信息，不构成法律建议。如需具体法律指导，请咨询德州持牌家庭法律师。',
-        infoResources: '资源', footerText: '最后更新：2026-04-12 | 仅供信息参考，非法律建议。'
+        disclaimerText: '本网站仅提供一般信息,不构成法律建议。如需具体法律指导,请咨询德州持牌家庭法律师。',
+        infoResources: '资源', footerText: '最后更新:2026-04-12 | 仅供信息参考,非法律建议。'
     }
 };
 
@@ -589,33 +589,33 @@ function isESPOWeek(thursdayOccurrence) {
 function generateCalendar(lang) {
     const container = document.getElementById('calendarContainer');
     container.innerHTML = '';
-    
+
     const dayNames = getDayName(lang);
     const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    
+
     // Generate months from April 2026 to May 2027
     const startYear = 2026, startMonth = 3; // April 2026
     const endYear = 2027, endMonth = 4; // May 2027
-    
+
     let year = startYear, month = startMonth;
     let rowDiv = null;
     let monthCount = 0;
-    
+
     while (year < endYear || (year === endYear && month <= endMonth)) {
         if (monthCount % 3 === 0) {
             rowDiv = document.createElement('div');
             rowDiv.className = 'calendar-row';
             container.appendChild(rowDiv);
         }
-        
+
         const calDiv = document.createElement('div');
         calDiv.className = 'month-calendar';
-        
+
         // Month header
         const h3 = document.createElement('h3');
         h3.textContent = getMonthName(year, month, lang);
         calDiv.appendChild(h3);
-        
+
         // Weekday headers
         const wdDiv = document.createElement('div');
         wdDiv.className = 'cal-weekdays';
@@ -626,18 +626,18 @@ function generateCalendar(lang) {
             wdDiv.appendChild(wd);
         }
         calDiv.appendChild(wdDiv);
-        
+
         // Days grid
         const daysDiv = document.createElement('div');
         daysDiv.className = 'cal-days';
-        
+
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const startPad = firstDay.getDay();
-        
+
         // Get Thursday occurrences for this month
         const thursdays = getWeekdayOccurrence(year, month, 4); // Thursday = 4
-        
+
         // Pad beginning
         for (let i = 0; i < startPad; i++) {
             const empty = document.createElement('div');
@@ -645,33 +645,33 @@ function generateCalendar(lang) {
             empty.innerHTML = '<div class="day-num"></div>';
             daysDiv.appendChild(empty);
         }
-        
+
         // Days
         for (let d = 1; d <= lastDay.getDate(); d++) {
             const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             const dayOfWeek = new Date(year, month, d).getDay();
-            
+
             const dayDiv = document.createElement('div');
             dayDiv.className = 'cal-day';
-            
+
             const numDiv = document.createElement('div');
             numDiv.className = 'day-num';
             numDiv.textContent = d;
             dayDiv.appendChild(numDiv);
-            
+
             const labelDiv = document.createElement('div');
             labelDiv.className = 'day-label';
             dayDiv.appendChild(labelDiv);
-            
+
             const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
             const isThursday = (dayOfWeek === 4);
             const breakInfo = isSchoolBreak(dateStr);
             const isHoliday = breakInfo !== null;
-            
+
             // Check if this Thursday is ESPO (1st, 3rd, 5th occurrence)
             const thursdayInfo = thursdays.find(t => t.date === d);
             const isESPO = thursdayInfo && isESPOWeek(thursdayInfo.occurrence);
-            
+
             if (isThursday) {
                 if (isESPO) {
                     dayDiv.classList.add('dad-espo');
@@ -689,13 +689,13 @@ function generateCalendar(lang) {
             } else if (isWeekend) {
                 dayDiv.classList.add('weekend');
             }
-            
+
             daysDiv.appendChild(dayDiv);
         }
-        
+
         calDiv.appendChild(daysDiv);
         rowDiv.appendChild(calDiv);
-        
+
         month++;
         monthCount++;
         if (month > 11) { month = 0; year++; }
@@ -708,7 +708,7 @@ function setLanguage(lang) {
         btn.classList.toggle('active', btn.dataset.lang === lang);
     });
     const t = i18n[lang];
-    
+
     // Update all text
     document.getElementById('mainTitle').textContent = t.mainTitle;
     document.getElementById('tabSchedule').textContent = t.tabSchedule;
@@ -739,7 +739,7 @@ function setLanguage(lang) {
     document.getElementById('catMedical').textContent = t.catMedical;
     document.getElementById('catActivities').textContent = t.catActivities;
     document.getElementById('catOther').textContent = t.catOther;
-    
+
     const fields = ['itemShelter','descShelter','itemFood','descFood','itemClothing','descClothing',
         'itemShoes','descShoes','itemSchoolBooks','descSchoolBooks','itemSchoolFees','descSchoolFees',
         'itemOutdoorSchool','descOutdoorSchool','itemTutoring','descTutoring',
@@ -753,14 +753,14 @@ function setLanguage(lang) {
         const el = document.getElementById(id);
         if (el && t[id]) el.textContent = t[id];
     });
-    
+
     document.getElementById('infoTitle').textContent = t.infoTitle;
     document.getElementById('infoDisclaimer').textContent = t.infoDisclaimer;
     document.getElementById('disclaimerText').textContent = t.disclaimerText;
     document.getElementById('infoResources').textContent = t.infoResources;
     document.getElementById('footerText').textContent = t.footerText;
     document.documentElement.lang = lang;
-    
+
     generateCalendar(lang);
 }
 
