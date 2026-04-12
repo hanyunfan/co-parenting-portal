@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Co-Parenting Portal | 共同抚养门户</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        /* Language Toggle */
+        .lang-toggle {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px;
+        }
+        .lang-btn {
+            padding: 8px 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .lang-btn.active { border-color: #4d96ff; background: rgba(77,150,255,0.2); }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        .nav-tab.active { border-color: #4d96ff; background: rgba(77,150,255,0.2); }
+        .nav-tab:hover { border-color: #4d96ff; }
+        
+        /* Section Cards */
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card h2 {
+            color: #ffd93d;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        /* Calendar */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .month-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .month-card h3 {
+            text-align: center;
+            color: #4d96ff;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .day {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 10px;
+            margin: 3px 0;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .day.mom { background: rgba(255,107,107,0.3); }
+        .day.dad { background: rgba(77,150,255,0.3); }
+        .day.shared { background: rgba(107,203,119,0.3); }
+        .day.holiday { background: rgba(255,217,61,0.3); }
+        .day .date { font-weight: bold; }
+        .day .label { opacity: 0.8; }
+        
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        .legend-color.mom { background: rgba(255,107,107,0.5); }
+        .legend-color.dad { background: rgba(77,150,255,0.5); }
+        .legend-color.shared { background: rgba(107,203,119,0.5); }
+        .legend-color.holiday { background: rgba(255,217,61,0.5); }
+        
+        /* Expense List */
+        .expense-category {
+            margin-bottom: 25px;
+        }
+        .expense-category h3 {
+            color: #4d96ff;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(77,150,255,0.3);
+        }
+        .expense-item {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .expense-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .expense-desc {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+        .expense-legal {
+            font-size: 0.8rem;
+            color: #4d96ff;
+        }
+        .expense-legal a {
+            color: #4d96ff;
+            text-decoration: none;
+        }
+        .expense-legal a:hover { text-decoration: underline; }
+        .covered-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .covered-badge.yes { background: rgba(107,203,119,0.3); color: #6bcb77; }
+        .covered-badge.maybe { background: rgba(255,217,61,0.3); color: #ffd93d; }
+        .covered-badge.no { background: rgba(255,107,107,0.3); color: #ff6b6b; }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .container { padding: 15px; }
+            .nav-tabs { gap: 5px; }
+            .nav-tab { padding: 10px 15px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-toggle">
+        <button class="lang-btn" data-lang="cn" onclick="setLanguage('cn')">🇨🇳 中文</button>
+        <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">🇺🇸 English</button>
+    </div>
+    
+    <div class="container">
+        <h1 id="mainTitle">Co-Parenting Portal</h1>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-section="schedule" onclick="showSection('schedule')" id="tabSchedule">📅 Schedule</button>
+            <button class="nav-tab" data-section="calendar" onclick="showSection('calendar')" id="tabCalendar">🗓️ Calendar</button>
+            <button class="nav-tab" data-section="expenses" onclick="showSection('expenses')" id="tabExpenses">💰 Expenses</button>
+            <button class="nav-tab" data-section="info" onclick="showSection('info')" id="tabInfo">ℹ️ Info</button>
+        </div>
+        
+        <!-- Schedule Section -->
+        <div class="section active" id="section-schedule">
+            <div class="card">
+                <h2 id="scheduleTitle">ESPO Custody Schedule</h2>
+                <p id="scheduleDesc" style="color: #aaa; margin-bottom: 20px;">
+                    Extended Standard Possession Order (Texas Family Code 153.317)
+                </p>
+                
+                <div class="expense-category">
+                    <h3 id="standardTimeTitle">Standard Possession</h3>
+                    <div class="day dad" style="margin-bottom: 8px;">
+                        <span class="label" id="standardDad">Father: 1st, 3rd, 5th weekends of each month</span>
+                    </div>
+                    <div class="day mom" style="margin-bottom: 8px;">
+                        <span class="label" id="standardMom">Mother: Primary residence</span>
+                    </div>
+                </div>
+                
+                <div class="expense-category">
+                    <h3 id="extendedTimeTitle">Extended Possession (ESPO)</h3>
+                    <div class="day dad" style="margin-bottom: 8px;">
+                        <span class="label" id="extendedDad">Father: Wednesday 6pm-8pm + 30 days summer</span>
+                    </div>
+                    <div class="day mom" style="margin-bottom: 8px;">
+                        <span class="label" id="extendedMom">Mother: Remainder of time</span>
+                    </div>
+                </div>
+                
+                <div class="expense-category">
+                    <h3 id="holidaysTitle">Holiday Schedule</h3>
+                    <div class="day shared" style="margin-bottom: 8px;">
+                        <span class="label" id="holidaysDesc">Alternating holidays - see calendar for details</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendar Section -->
+        <div class="section" id="section-calendar">
+            <div class="card">
+                <h2 id="calendarTitle">RRISD Calendar 2025-2026</h2>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar will be generated by JavaScript -->
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color mom"></div>
+                        <span id="legendMom">Mom's Time</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color dad"></div>
+                        <span id="legendDad">Dad's Time</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color shared"></div>
+                        <span id="legendShared">Shared/School</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color holiday"></div>
+                        <span id="legendHoliday">Holiday/No School</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Expenses Section -->
+        <div class="section" id="section-expenses">
+            <div class="card">
+                <h2 id="expensesTitle">Texas Child Support - What's Covered</h2>
+                <p id="expensesDesc" style="color: #aaa; margin-bottom: 20px;">
+                    Under Texas Family Code §154.001, child support covers basic necessities. Below is a detailed breakdown.
+                </p>
+                
+                <div class="expense-category">
+                    <h3 id="catBasic">🏠 Basic Necessities</h3>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemShelter">Shelter / Housing</div>
+                            <div class="expense-desc" id="descShelter">Rent, mortgage, utilities, household expenses</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeShelter">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemFood">Food & Nutrition</div>
+                            <div class="expense-desc" id="descFood">Groceries, meals, school lunches</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeFood">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemClothing">Clothing ( Everyday )</div>
+                            <div class="expense-desc" id="descClothing">Daily wear, socks, underwear, seasonal clothing</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeClothing">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemShoes">Shoes ( Everyday )</div>
+                            <div class="expense-desc" id="descShoes">Daily shoes, sneakers, sandals, socks</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeShoes">Covered</span>
+                    </div>
+                </div>
+                
+                <div class="expense-category">
+                    <h3 id="catEducation">📚 Education</h3>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemSchoolBooks">School Books & Supplies</div>
+                            <div class="expense-desc" id="descSchoolBooks">Textbooks, notebooks, pens, backpacks</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeSchoolBooks">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemSchoolFees">School Fees & Activities</div>
+                            <div class="expense-desc" id="descSchoolFees">Club fees, class fees, school events</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeSchoolFees">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemOutdoorSchool">Outdoor School / Field Trips</div>
+                            <div class="expense-desc" id="descOutdoorSchool">Camp, school-sponsored overnight programs</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeOutdoorSchool">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemTutoring">Tutoring</div>
+                            <div class="expense-desc" id="descTutoring">Academic support when needed</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge maybe" id="badgeTutoring">Case-by-Case</span>
+                    </div>
+                </div>
+                
+                <div class="expense-category">
+                    <h3 id="catMedical">🏥 Medical & Health</h3>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemBasicMedical">Basic Medical Care</div>
+                            <div class="expense-desc" id="descBasicMedical">Doctor visits, vaccinations, prescriptions</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeBasicMedical">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemDental">Dental Care</div>
+                            <div class="expense-desc" id="descDental">Regular checkups, cleanings, basic dental work</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeDental">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemHealthInsurance">Health Insurance</div>
+                            <div class="expense-desc" id="descHealthInsurance">Premium costs (ordered separately under §154.162)</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.162" target="_blank">Texas Family Code §154.162</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeHealthInsurance">Covered</span>
+                    </div>
+                </div>
+                
+                <div class="expense-category">
+                    <h3 id="catActivities">🎭 Extracurricular & Social</h3>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemSports">Sports & Athletics</div>
+                            <div class="expense-desc" id="descSports">Team fees, equipment, uniforms</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge maybe" id="badgeSports">Case-by-Case</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemMusic">Music & Arts Lessons</div>
+                            <div class="expense-desc" id="descMusic">Instrument lessons, art classes</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge maybe" id="badgeMusic">Case-by-Case</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemBirthday">Birthday Party Gifts</div>
+                            <div class="expense-desc" id="descBirthday">Gifts for friend's birthday parties (social development)</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge maybe" id="badgeBirthday">Negotiated</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemSummerCamp">Summer Camp</div>
+                            <div class="expense-desc" id="descSummerCamp">Day camp, overnight camp programs</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge maybe" id="badgeSummerCamp">Case-by-Case</span>
+                    </div>
+                </div>
+                
+                <div class="expense-category">
+                    <h3 id="catOther">📋 Additional Expenses</h3>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemDaycare">Daycare / After-School Care</div>
+                            <div class="expense-desc" id="descDaycare">Childcare to allow parent to work</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeDaycare">Covered</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemTransportation">Transportation for Custody</div>
+                            <div class="expense-desc" id="descTransportation">Driving between parents' homes for visitation</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.153.htm#153.312" target="_blank">Texas Family Code §153.312</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge maybe" id="badgeTransportation">Negotiated</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemCollege">College Expenses</div>
+                            <div class="expense-desc" id="descCollege">When child turns 18 (separate agreement under §154.002)</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.002" target="_blank">Texas Family Code §154.002</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge maybe" id="badgeCollege">Separate Agreement</span>
+                    </div>
+                    
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name" id="itemSpecial">Special Needs / Extraordinary Expenses</div>
+                            <div class="expense-desc" id="descSpecial">Learning disabilities, chronic illness, etc.</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm#154.001" target="_blank">Texas Family Code §154.001</a>
+                            </div>
+                        </div>
+                        <span class="covered-badge yes" id="badgeSpecial">Covered</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Section -->
+        <div class="section" id="section-info">
+            <div class="card">
+                <h2 id="infoTitle">Important Information</h2>
+                
+                <div class="expense-category">
+                    <h3 id="infoDisclaimer">Disclaimer</h3>
+                    <p style="color: #aaa; line-height: 1.8;" id="disclaimerText">
+                        This website provides general information only and does not constitute legal advice. 
+                        Consult a licensed Texas family law attorney for specific legal guidance.
+                    </p>
+                </div>
+                
+                <div class="expense-category">
+                    <h3 id="infoResources">Resources</h3>
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name">Texas Family Code - Child Support</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.154.htm" target="_blank">Texas Family Code Chapter 154</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name">Texas Family Code - Possession & Access</div>
+                            <div class="expense-legal">
+                                <a href="https://statutes.capitol.texas.gov/Docs/FA/htm/FA.153.htm" target="_blank">Texas Family Code Chapter 153</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="expense-item">
+                        <div>
+                            <div class="expense-name">Texas State Law Library - Child Custody</div>
+                            <div class="expense-legal">
+                                <a href="https://guides.sll.texas.gov/child-custody-and-support" target="_blank">guides.sll.texas.gov</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p id="footerText">Last updated: 2026-04-11 | For informational purposes only</p>
+    </footer>
+
+    <script>
+        let language = 'en';
+        
+        const i18n = {
+            en: {
+                mainTitle: 'Co-Parenting Portal',
+                tabSchedule: '📅 Schedule',
+                tabCalendar: '🗓️ Calendar',
+                tabExpenses: '💰 Expenses',
+                tabInfo: 'ℹ️ Info',
+                
+                // Schedule
+                scheduleTitle: 'ESPO Custody Schedule',
+                scheduleDesc: 'Extended Standard Possession Order (Texas Family Code 153.317)',
+                standardTimeTitle: 'Standard Possession',
+                standardDad: 'Father: 1st, 3rd, 5th weekends of each month',
+                standardMom: 'Mother: Primary residence',
+                extendedTimeTitle: 'Extended Possession (ESPO)',
+                extendedDad: 'Father: Wednesday 6pm-8pm + 30 days summer',
+                extendedMom: 'Mother: Remainder of time',
+                holidaysTitle: 'Holiday Schedule',
+                holidaysDesc: 'Alternating holidays - see calendar for details',
+                
+                // Calendar
+                calendarTitle: 'RRISD Calendar 2025-2026',
+                legendMom: "Mom's Time",
+                legendDad: "Dad's Time",
+                legendShared: 'Shared/School',
+                legendHoliday: 'Holiday/No School',
+                
+                // Expenses
+                expensesTitle: 'Texas Child Support - What\'s Covered',
+                expensesDesc: 'Under Texas Family Code §154.001, child support covers basic necessities.',
+                catBasic: '🏠 Basic Necessities',
+                catEducation: '📚 Education',
+                catMedical: '🏥 Medical & Health',
+                catActivities: '🎭 Extracurricular & Social',
+                catOther: '📋 Additional Expenses',
+                
+                itemShelter: 'Shelter / Housing',
+                descShelter: 'Rent, mortgage, utilities, household expenses',
+                itemFood: 'Food & Nutrition',
+                descFood: 'Groceries, meals, school lunches',
+                itemClothing: 'Clothing (Everyday)',
+                descClothing: 'Daily wear, socks, underwear, seasonal clothing',
+                itemShoes: 'Shoes (Everyday)',
+                descShoes: 'Daily shoes, sneakers, sandals, socks',
+                itemSchoolBooks: 'School Books & Supplies',
+                descSchoolBooks: 'Textbooks, notebooks, pens, backpacks',
+                itemSchoolFees: 'School Fees & Activities',
+                descSchoolFees: 'Club fees, class fees, school events',
+                itemOutdoorSchool: 'Outdoor School / Field Trips',
+                descOutdoorSchool: 'Camp, school-sponsored overnight programs',
+                itemTutoring: 'Tutoring',
+                descTutoring: 'Academic support when needed',
+                itemBasicMedical: 'Basic Medical Care',
+                descBasicMedical: 'Doctor visits, vaccinations, prescriptions',
+                itemDental: 'Dental Care',
+                descDental: 'Regular checkups, cleanings, basic dental work',
+                itemHealthInsurance: 'Health Insurance',
+                descHealthInsurance: 'Premium costs (ordered separately under §154.162)',
+                itemSports: 'Sports & Athletics',
+                descSports: 'Team fees, equipment, uniforms',
+                itemMusic: 'Music & Arts Lessons',
+                descMusic: 'Instrument lessons, art classes',
+                itemBirthday: 'Birthday Party Gifts',
+                descBirthday: 'Gifts for friend\'s birthday parties (social development)',
+                itemSummerCamp: 'Summer Camp',
+                descSummerCamp: 'Day camp, overnight camp programs',
+                itemDaycare: 'Daycare / After-School Care',
+                descDaycare: 'Childcare to allow parent to work',
+                itemTransportation: 'Transportation for Custody',
+                descTransportation: 'Driving between parents\' homes for visitation',
+                itemCollege: 'College Expenses',
+                descCollege: 'When child turns 18 (separate agreement under §154.002)',
+                itemSpecial: 'Special Needs / Extraordinary Expenses',
+                descSpecial: 'Learning disabilities, chronic illness, etc.',
+                
+                // Info
+                infoTitle: 'Important Information',
+                infoDisclaimer: 'Disclaimer',
+                disclaimerText: 'This website provides general information only and does not constitute legal advice. Consult a licensed Texas family law attorney for specific legal guidance.',
+                infoResources: 'Resources',
+                
+                footerText: 'Last updated: 2026-04-11 | For informational purposes only'
+            },
+            cn: {
+                mainTitle: '共同抚养门户',
+                tabSchedule: '📅 时间表',
+                tabCalendar: '🗓️ 日历',
+                tabExpenses: '💰 费用',
+                tabInfo: 'ℹ️ 信息',
+                
+                // Schedule
+                scheduleTitle: 'ESPO 抚养时间表',
+                scheduleDesc: '扩展标准探视令 (Texas Family Code 153.317)',
+                standardTimeTitle: '标准探视',
+                standardDad: '父亲：每月第1、3、5个周末',
+                standardMom: '母亲：主要居住地',
+                extendedTimeTitle: '扩展探视 (ESPO)',
+                extendedDad: '父亲：周三下午6点-8点 + 夏季30天',
+                extendedMom: '母亲：其余时间',
+                holidaysTitle: '节假日安排',
+                holidaysDesc: '轮流过节 - 详见日历',
+                
+                // Calendar
+                calendarTitle: 'RRISD 2025-2026 校历',
+                legendMom: '妈妈时间',
+                legendDad: '爸爸时间',
+                legendShared: '共享/学校',
+                legendHoliday: '放假',
+                
+                // Expenses
+                expensesTitle: '德州子女抚养费 - 涵盖项目',
+                expensesDesc: '根据德州家庭法 §154.001，抚养费涵盖基本必需品。',
+                catBasic: '🏠 基本必需品',
+                catEducation: '📚 教育',
+                catMedical: '🏥 医疗健康',
+                catActivities: '🎭 课外活动',
+                catOther: '📋 其他费用',
+                
+                itemShelter: '住房',
+                descShelter: '租金、房贷、水电费、日常开支',
+                itemFood: '食物与营养',
+                descFood: '食品、日用品、学校午餐',
+                itemClothing: '服装（日常）',
+                descClothing: '日常穿着、袜子、内衣、季节性服装',
+                itemShoes: '鞋子（日常）',
+                descShoes: '日常鞋、运动鞋、凉鞋、袜子',
+                itemSchoolBooks: '学校书本和用品',
+                descSchoolBooks: '课本、笔记本、文具、书包',
+                itemSchoolFees: '学校费用和活动',
+                descSchoolFees: '俱乐部费、班级费、学校活动费',
+                itemOutdoorSchool: '户外学校/实地考察',
+                descOutdoorSchool: '营地、学校组织的过夜项目',
+                itemTutoring: '辅导',
+                descTutoring: '需要时的学业支持',
+                itemBasicMedical: '基本医疗',
+                descBasicMedical: '就诊、疫苗、处方药',
+                itemDental: '牙科护理',
+                descDental: '常规检查、洗牙、基本牙科治疗',
+                itemHealthInsurance: '健康保险',
+                descHealthInsurance: '保费（根据 §154.162 单独命令）',
+                itemSports: '体育运动',
+                descSports: '团队费用、设备、运动服',
+                itemMusic: '音乐艺术课',
+                descMusic: '乐器课、美术课',
+                itemBirthday: '生日派对礼物',
+                descBirthday: '参加同学生日派对的礼物（社交发展）',
+                itemSummerCamp: '夏令营',
+                descSummerCamp: '日营、过夜营项目',
+                itemDaycare: '日托/课后托管',
+                descDaycare: '以便父母工作的儿童托管',
+                itemTransportation: '探视交通费',
+                descTransportation: '在父母住处之间开车探视',
+                itemCollege: '大学费用',
+                descCollege: '孩子18岁后（根据 §154.002 的单独协议）',
+                itemSpecial: '特殊需求/额外费用',
+                descSpecial: '学习障碍、慢性病等',
+                
+                // Info
+                infoTitle: '重要信息',
+                infoDisclaimer: '免责声明',
+                disclaimerText: '本网站仅提供一般信息，不构成法律建议。如需具体法律指导，请咨询德州持牌家庭法律师。',
+                infoResources: '资源',
+                
+                footerText: '最后更新：2026-04-11 | 仅供信息参考'
+            }
+        };
+        
+        function setLanguage(lang) {
+            language = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+            
+            const t = i18n[lang];
+            
+            // Update all text elements
+            document.getElementById('mainTitle').textContent = t.mainTitle;
+            document.getElementById('tabSchedule').textContent = t.tabSchedule;
+            document.getElementById('tabCalendar').textContent = t.tabCalendar;
+            document.getElementById('tabExpenses').textContent = t.tabExpenses;
+            document.getElementById('tabInfo').textContent = t.tabInfo;
+            
+            document.getElementById('scheduleTitle').textContent = t.scheduleTitle;
+            document.getElementById('scheduleDesc').textContent = t.scheduleDesc;
+            document.getElementById('standardTimeTitle').textContent = t.standardTimeTitle;
+            document.getElementById('standardDad').textContent = t.standardDad;
+            document.getElementById('standardMom').textContent = t.standardMom;
+            document.getElementById('extendedTimeTitle').textContent = t.extendedTimeTitle;
+            document.getElementById('extendedDad').textContent = t.extendedDad;
+            document.getElementById('extendedMom').textContent = t.extendedMom;
+            document.getElementById('holidaysTitle').textContent = t.holidaysTitle;
+            document.getElementById('holidaysDesc').textContent = t.holidaysDesc;
+            
+            document.getElementById('calendarTitle').textContent = t.calendarTitle;
+            document.getElementById('legendMom').textContent = t.legendMom;
+            document.getElementById('legendDad').textContent = t.legendDad;
+            document.getElementById('legendShared').textContent = t.legendShared;
+            document.getElementById('legendHoliday').textContent = t.legendHoliday;
+            
+            document.getElementById('expensesTitle').textContent = t.expensesTitle;
+            document.getElementById('expensesDesc').textContent = t.expensesDesc;
+            document.getElementById('catBasic').textContent = t.catBasic;
+            document.getElementById('catEducation').textContent = t.catEducation;
+            document.getElementById('catMedical').textContent = t.catMedical;
+            document.getElementById('catActivities').textContent = t.catActivities;
+            document.getElementById('catOther').textContent = t.catOther;
+            
+            document.getElementById('itemShelter').textContent = t.itemShelter;
+            document.getElementById('descShelter').textContent = t.descShelter;
+            document.getElementById('itemFood').textContent = t.itemFood;
+            document.getElementById('descFood').textContent = t.descFood;
+            document.getElementById('itemClothing').textContent = t.itemClothing;
+            document.getElementById('descClothing').textContent = t.descClothing;
+            document.getElementById('itemShoes').textContent = t.itemShoes;
+            document.getElementById('descShoes').textContent = t.descShoes;
+            document.getElementById('itemSchoolBooks').textContent = t.itemSchoolBooks;
+            document.getElementById('descSchoolBooks').textContent = t.descSchoolBooks;
+            document.getElementById('itemSchoolFees').textContent = t.itemSchoolFees;
+            document.getElementById('descSchoolFees').textContent = t.descSchoolFees;
+            document.getElementById('itemOutdoorSchool').textContent = t.itemOutdoorSchool;
+            document.getElementById('descOutdoorSchool').textContent = t.descOutdoorSchool;
+            document.getElementById('itemTutoring').textContent = t.itemTutoring;
+            document.getElementById('descTutoring').textContent = t.descTutoring;
+            document.getElementById('itemBasicMedical').textContent = t.itemBasicMedical;
+            document.getElementById('descBasicMedical').textContent = t.descBasicMedical;
+            document.getElementById('itemDental').textContent = t.itemDental;
+            document.getElementById('descDental').textContent = t.descDental;
+            document.getElementById('itemHealthInsurance').textContent = t.itemHealthInsurance;
+            document.getElementById('descHealthInsurance').textContent = t.descHealthInsurance;
+            document.getElementById('itemSports').textContent = t.itemSports;
+            document.getElementById('descSports').textContent = t.descSports;
+            document.getElementById('itemMusic').textContent = t.itemMusic;
+            document.getElementById('descMusic').textContent = t.descMusic;
+            document.getElementById('itemBirthday').textContent = t.itemBirthday;
+            document.getElementById('descBirthday').textContent = t.descBirthday;
+            document.getElementById('itemSummerCamp').textContent = t.itemSummerCamp;
+            document.getElementById('descSummerCamp').textContent = t.descSummerCamp;
+            document.getElementById('itemDaycare').textContent = t.itemDaycare;
+            document.getElementById('descDaycare').textContent = t.descDaycare;
+            document.getElementById('itemTransportation').textContent = t.itemTransportation;
+            document.getElementById('descTransportation').textContent = t.descTransportation;
+            document.getElementById('itemCollege').textContent = t.itemCollege;
+            document.getElementById('descCollege').textContent = t.descCollege;
+            document.getElementById('itemSpecial').textContent = t.itemSpecial;
+            document.getElementById('descSpecial').textContent = t.descSpecial;
+            
+            document.getElementById('infoTitle').textContent = t.infoTitle;
+            document.getElementById('infoDisclaimer').textContent = t.infoDisclaimer;
+            document.getElementById('disclaimerText').textContent = t.disclaimerText;
+            document.getElementById('infoResources').textContent = t.infoResources;
+            document.getElementById('footerText').textContent = t.footerText;
+            
+            document.documentElement.lang = lang;
+        }
+        
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('section-' + section).classList.add('active');
+            document.querySelector('[data-section="' + section + '"]').classList.add('active');
+        }
+        
+        // Generate RRISD Calendar
+        function generateCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const months = [
+                { name: 'August 2025', days: [
+                    { date: 25, type: 'shared', label: 'First Day of School' }
+                ]},
+                { name: 'September 2025', days: [
+                    { date: 1, type: 'holiday', label: 'Labor Day' },
+                    { date: 15, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 22, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 29, type: 'dad', label: 'ESPO Wednesday' }
+                ]},
+                { name: 'October 2025', days: [
+                    { date: 6, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 13, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 17, type: 'holiday', label: 'Fall Break' },
+                    { date: 20, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 27, type: 'dad', label: 'ESPO Wednesday' }
+                ]},
+                { name: 'November 2025', days: [
+                    { date: 3, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 10, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 17, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 24, type: 'holiday', label: 'Thanksgiving' },
+                    { date: 25, type: 'holiday', label: 'Thanksgiving' },
+                    { date: 26, type: 'dad', label: 'ESPO Wednesday' }
+                ]},
+                { name: 'December 2025', days: [
+                    { date: 1, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 8, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 15, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 22, type: 'dad', label: 'Winter Break' },
+                    { date: 25, type: 'holiday', label: 'Christmas' },
+                    { date: 29, type: 'dad', label: 'Winter Break' }
+                ]},
+                { name: 'January 2026', days: [
+                    { date: 1, type: 'holiday', label: "New Year's Day" },
+                    { date: 5, type: 'dad', label: 'Winter Break' },
+                    { date: 6, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 13, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 19, type: 'holiday', label: 'MLK Day' },
+                    { date: 20, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 27, type: 'dad', label: 'ESPO Wednesday' }
+                ]},
+                { name: 'February 2026', days: [
+                    { date: 2, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 9, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 16, type: 'holiday', label: "Presidents' Day" },
+                    { date: 17, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 24, type: 'dad', label: 'ESPO Wednesday' }
+                ]},
+                { name: 'March 2026', days: [
+                    { date: 2, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 9, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 16, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 23, type: 'holiday', label: 'Spring Break' },
+                    { date: 24, type: 'holiday', label: 'Spring Break' },
+                    { date: 25, type: 'holiday', label: 'Spring Break' },
+                    { date: 26, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 30, type: 'dad', label: 'ESPO Wednesday' }
+                ]},
+                { name: 'April 2026', days: [
+                    { date: 6, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 13, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 20, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 27, type: 'dad', label: 'ESPO Wednesday' }
+                ]},
+                { name: 'May 2026', days: [
+                    { date: 4, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 11, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 18, type: 'dad', label: 'ESPO Wednesday' },
+                    { date: 25, type: 'holiday', label: 'Memorial Day' },
+                    { date: 28, type: 'shared', label: 'Last Day of School' }
+                ]}
+            ];
+            
+            months.forEach(month => {
+                const card = document.createElement('div');
+                card.className = 'month-card';
+                let html = `<h3>${month.name}</h3>`;
+                month.days.forEach(day => {
+                    html += `<div class="day ${day.type}"><span class="date">${day.date}</span><span class="label">${day.label}</span></div>`;
+                });
+                card.innerHTML = html;
+                grid.appendChild(card);
+            });
+        }
+        
+        generateCalendar();
+        setLanguage('en');
+    </script>
+</body>
+</html>
