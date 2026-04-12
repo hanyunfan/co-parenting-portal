@@ -772,13 +772,12 @@ function generateSPOCalendar(lang) {
 // Spring/Winter breaks: split evenly. Odd years → Mom first, Dad second. Even years → Dad first, Mom second.
 function getSchoolBreakCustody(dateStr) {
     const d = new Date(dateStr);
-    const yr = d.getFullYear();
     // ---- SPRING BREAK ----
     // RRISD Spring Break 2027: March 15-19 (5 days, starts Mon)
     if (d >= new Date(2027, 2, 15) && d <= new Date(2027, 2, 19)) {
         // Odd year (2027): Mom first half (3 days Mon-Wed), Dad second half (2 days Thu-Fri)
         const dayOfBreak = Math.floor((d - new Date(2027, 2, 15)) / (1000*60*60*24));
-        return yr % 2 === 1 ? (dayOfBreak < 3 ? 'mom' : 'dad') : (dayOfBreak < 2 ? 'dad' : 'mom');
+        return year % 2 === 1 ? (dayOfBreak < 3 ? 'mom' : 'dad') : (dayOfBreak < 2 ? 'dad' : 'mom');
     }
     // ---- WINTER BREAK ----
     // RRISD Winter Break 2026-2027: Dec 18 - Jan 3 (17 days)
@@ -788,7 +787,8 @@ function getSchoolBreakCustody(dateStr) {
         const totalDays = Math.floor((winEnd - winStart) / (1000*60*60*24)) + 1; // 17
         const halfLen = Math.floor(totalDays / 2); // 8
         const dayOfBreak = Math.floor((d - winStart) / (1000*60*60*24));
-        return yr % 2 === 0 ? (dayOfBreak < halfLen ? 'dad' : 'mom') : (dayOfBreak < halfLen ? 'mom' : 'dad');
+        // Even year (2026): Dad first half, Mom second half
+        return year % 2 === 0 ? (dayOfBreak < halfLen ? 'dad' : 'mom') : (dayOfBreak < halfLen ? 'mom' : 'dad');
     }
     return 'none';
 }
