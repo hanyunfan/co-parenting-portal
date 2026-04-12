@@ -81,7 +81,8 @@
         .cal-day.mom { background: rgba(255,107,107,0.25); }
         .cal-day.holiday { background: rgba(255,217,61,0.35); }
         .cal-day.national-holiday { background: rgba(255,165,0,0.4); border: 1px solid rgba(255,165,0,0.7); }
-        .cal-day.summer-dad { background: rgba(155,89,232,0.4); border: 2px solid rgba(155,89,232,0.7); }
+        .cal-day.summer-dad { background: rgba(155,89,232,0.5); border: 2px solid rgba(155,89,232,0.8); }
+        .cal-day.summer-mom { background: rgba(255,107,107,0.15); }
         
         .cal-container { display: block; }
         .disclaimer { background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); border-radius: 8px; padding: 12px; margin-top: 20px; color: #ff8888; font-size: 0.85rem; line-height: 1.6; }
@@ -457,7 +458,7 @@ const i18n = {
         standardDad: 'Father: Every Thursday 6:00 PM - 8:00 PM',
         standardMom: 'Mother: All other times (primary residence)',
         extendedTimeTitle: 'Extended Possession (ESPO)',
-        extendedDad: 'Father: 1st, 3rd, 5th week Thu after school - Sun 6PM + 30 days summer; every Thu 6-8PM on weeks 2 & 4',
+        extendedDad: 'Father: 1st, 3rd, 5th week Thu after school - Sun 6PM (+ Mon AM if school off) + 30 consecutive days in summer; weeks 2 & 4: every Thu 6PM-8PM (standard SPO)',
         extendedMom: 'Mother: Remainder of time',
         holidaysTitle: 'Holiday Schedule',
         holidaysDesc: 'Parents alternate major holidays each year (see §153.314). National holidays marked on calendar in orange.',
@@ -710,15 +711,18 @@ function generateSPOCalendar(lang) {
             const isHoliday = breakInfo !== null;
             const natHoliday = getNationalHolidayLabel(year, month, d);
             const isThursday = dow === 4;
-            if (isThursday) {
-                dayDiv.classList.add('dad');
-                labelDiv.textContent = lang === 'cn' ? '爸爸6-8pm' : 'Dad 6-8pm';
-            } else if (isHoliday) {
+            // Summer break: SPO suspended, regular schedule pauses; treat as holiday/break period
+            const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
+            const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
+            if (isHoliday) {
                 dayDiv.classList.add('holiday');
                 labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
             } else if (natHoliday) {
                 dayDiv.classList.add('national-holiday');
                 labelDiv.textContent = natHoliday[lang] || natHoliday.en;
+            } else if (isThursday && !isSummerBreak) {
+                dayDiv.classList.add('dad');
+                labelDiv.textContent = lang === 'cn' ? '爸爸6-8pm' : 'Dad 6-8pm';
             } else {
                 dayDiv.classList.add('mom');
             }
@@ -763,6 +767,13 @@ function generateESPOCalendar(lang) {
             const breakInfo = isSchoolBreak(dateStr);
             const isHoliday = breakInfo !== null;
             const natHoliday = getNationalHolidayLabel(year, month, d);
+            const isThursday = dow === 4, isFriday = dow === 5, isSaturday = dow === 6, isSunday = dow === 0;
+            // Summer break: ESPO schedule pauses, Dad gets 30 consecutive days (July 1-30)
+            // Mom gets remaining summer days. Regular Thu-Fri-Sat-Sun ESPO does NOT apply in summer.
+            const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
+            // Dad's 30 summer days: July 1-30 (0-indexed month = 6)
+            const isDadSummerDay = isSummerBreak && (month === 6 && d >= 1 && d <= 30);
+            // During school year (non-summer): compute ESPO
             // Compute Monday of this week
             const mondayOfWeek = new Date(year, month, d);
             mondayOfWeek.setDate(d - (dow === 0 ? 6 : dow - 1));
@@ -774,23 +785,32 @@ function generateESPOCalendar(lang) {
             const thursdayOfWeekYear = thursdayOfWeek.getFullYear();
             const isThuOfWeekESPO = thursdayOfWeekMonth === month && thursdayOfWeekYear === year && espothuSet.has(thuOfWeek);
             // ESPO: Thu+Fri+Sat+Sun of an ESPO week (Mon AM => Mom resumes)
-            const isThursday = dow === 4, isFriday = dow === 5, isSaturday = dow === 6, isSunday = dow === 0;
             const isESPOWeekDay = isThuOfWeekESPO && (isThursday || isFriday || isSaturday || isSunday);
-            if (isHoliday && !isESPOWeekDay) {
-                dayDiv.classList.add('holiday');
+            if (isDadSummerDay) {
+                // Dad's 30 consecutive summer days (July 1-30) — overrides everything
+                dayDiv.classList.add('summer-dad');
+                labelDiv.textContent = lang === 'cn' ? '爸爸(暑假30天)' : 'Dad-Sum';
+            } else if (isHoliday && !isESPOWeekDay) {
+                // Summer days not in Dad's 30 → Mom's summer (July 31 + other summer days)
+                dayDiv.classList.add('summer-mom');
                 labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
             } else if (natHoliday) {
                 dayDiv.classList.add('national-holiday');
                 labelDiv.textContent = natHoliday[lang] || natHoliday.en;
             } else if (isESPOWeekDay) {
+                // School year ESPO weeks: Thu+Fri+Sat+Sun = Dad
                 dayDiv.classList.add('dad');
                 if (isThursday) labelDiv.textContent = lang === 'cn' ? '爸爸ESPO' : 'Dad-ESPO';
                 else if (isSunday) labelDiv.textContent = lang === 'cn' ? '爸爸(周一早)' : 'Dad-Sun';
                 else labelDiv.textContent = lang === 'cn' ? '爸爸' : 'Dad';
-            } else if (isThursday) {
-                // Non-ESPO Thursday: Dad still gets 6-8pm
+            } else if (isThursday && !isSummerBreak) {
+                // Non-ESPO Thursday (week 2 & 4): Dad gets SPO Thu after school - next school day morning
+                // (Only applies during school year; no school = no after-school)
                 dayDiv.classList.add('dad-partial');
-                labelDiv.textContent = lang === 'cn' ? '爸爸6-8pm' : 'Dad 6-8pm';
+                labelDiv.textContent = lang === 'cn' ? '放学后至次日上學' : 'Dad (after school)';
+            } else if (isThursday && isSummerBreak) {
+                // Summer: no school, no standard SPO Thu
+                dayDiv.classList.add('mom');
             } else {
                 dayDiv.classList.add('mom');
             }
