@@ -713,7 +713,6 @@ function generateSPOCalendar(lang) {
             const isThursday = dow === 4;
             // Summer break: SPO suspended, regular schedule pauses; treat as holiday/break period
             const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
-            const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
             if (isHoliday) {
                 dayDiv.classList.add('holiday');
                 labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
