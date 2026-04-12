@@ -673,30 +673,39 @@ function getWeekdayOccurrence(year, month, targetWeekday) {
 // A weekend is labeled by the Friday that STARTS it.
 // E.g. May 2026 starts on Fri → first Thu (May 7) has weekend starting Fri May 8 (2nd Fri) → label=2.
 // Aug 2026 starts on Sat → first Thu (Aug 6) has weekend starting Fri Aug 7 (1st Fri) → label=1.
-function getThursdayWeekLabel(thuDate, month, year) {
-    // Find the Friday that starts the weekend for this Thursday
-    const dow = new Date(year, month, thuDate).getDay(); // 0=Sun,3=Thu,4=Fri,5=Sat,6=Sun
-    const mondayOfWeek = new Date(year, month, thuDate);
-    mondayOfWeek.setDate(thuDate - (dow === 0 ? 6 : dow - 1));
+function getThursdayWeekLabel(day, month, year) {
+    // Find which weekend (1-5) this day belongs to.
+    // Weekend = Thu evening to Sun evening, anchored by Thursday.
+    // Weekend's number = count of Fridays in this month that are STRICTLY LESS than this day's Friday.
+    // The Friday of the week = the Friday on or after (day's Monday + 4).
+    const dow = new Date(year, month, day).getDay(); // 0=Sun,3=Thu,4=Fri,5=Sat,6=Sun
+    const mondayOfWeek = new Date(year, month, day);
+    mondayOfWeek.setDate(day - (dow === 0 ? 6 : dow - 1));
     const friOfWeek = new Date(mondayOfWeek);
     friOfWeek.setDate(mondayOfWeek.getDate() + 4);
     const friDay = friOfWeek.getDate();
-    const friMonth = friOfWeek.getMonth();
-    // Count Fridays in this month that are <= friDay
-    let friCount = 0;
+    const friMonth = friOfWeek.getMonth(); // 0-indexed
     const lastDay = new Date(year, month + 1, 0).getDate();
-    for (let d = 1; d <= lastDay; d++) {
-        if (new Date(year, month, d).getDay() === 5) {
-            friCount++;
-            if (d === friDay) break; // this is our Friday
-        }
+    // If the Friday is in a DIFFERENT month, this day belongs to Weekend 1 of that next month
+    if (friMonth !== month) return { label: 0, nextMonth: true };
+    // Count Fridays in THIS month that are strictly < friDay
+    let friCount = 0;
+    for (let fd = 1; fd < friDay; fd++) {
+        if (new Date(year, month, fd).getDay() === 5) friCount++;
     }
-    return friCount;
+    // friCount = number of Fridays BEFORE friDay in this month
+    // The weekend is labeled by (friCount + 1)
+    return { label: friCount + 1, nextMonth: false };
 }
 
-function isESPOWeek(thursdayDate, month, year) {
-    const label = getThursdayWeekLabel(thursdayDate, month, year);
+function isESPOWeek(day, month, year) {
+    const { label, nextMonth } = getThursdayWeekLabel(day, month, year);
+    if (nextMonth) return true; // Weekend 1 of next month = ESPO
     return label === 1 || label === 3 || label === 5;
+}
+
+function isESPOWeekend(day, month, year) {
+    return isESPOWeek(day, month, year);
 }
 
 function showCalMode(mode) {
@@ -780,7 +789,7 @@ function generateESPOCalendar(lang) {
         const lastDay = new Date(year, month + 1, 0);
         const startPad = firstDay.getDay();
         const thursdays = getWeekdayOccurrence(year, month, 4);
-        // Set of dates (day numbers) that are ESPO Thursdays (1st/3rd/5th week)
+        // ESPO: day is Dad if it's in a weekend anchored by a 1st/3rd/5th Fri-of-month Thursday
         const espothuSet = new Set(thursdays.filter(t => isESPOWeek(t.date, month, year)).map(t => t.date));
         for (let i = 0; i < startPad; i++) { const empty = document.createElement('div'); empty.className = 'cal-day other-month'; empty.innerHTML = '<div class="day-num"></div>'; daysDiv.appendChild(empty); }
         for (let d = 1; d <= lastDay.getDate(); d++) {
@@ -793,53 +802,51 @@ function generateESPOCalendar(lang) {
             const isHoliday = breakInfo !== null;
             const natHoliday = getNationalHolidayLabel(year, month, d);
             const isThursday = dow === 4, isFriday = dow === 5, isSaturday = dow === 6, isSunday = dow === 0;
-            // Summer break: ESPO schedule pauses, Dad gets 30 consecutive days (July 1-30)
-            // Mom gets remaining summer days. Regular Thu-Fri-Sat-Sun ESPO does NOT apply in summer.
+            // Summer break: ESPO pauses, Dad gets 30 consecutive days (July 1-30)
             const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
-            // Dad's 30 summer days: July 1-30 (0-indexed month = 6)
             const isDadSummerDay = isSummerBreak && (month === 6 && d >= 1 && d <= 30);
-            // During school year (non-summer): compute ESPO
-            // Compute Monday of this week
+            // This day's weekend is ESPO if:
+            //   - It is Thu/Fri/Sat/Sun AND its Thursday is in espothuSet (1st/3rd/5th Thu of month)
+            //   - OR its Thursday belongs to Weekend 1 of NEXT month (e.g. Apr 30)
+            const dowIsESPO = (isThursday || isFriday || isSaturday || isSunday);
+            // Find Thursday of this week
             const mondayOfWeek = new Date(year, month, d);
             mondayOfWeek.setDate(d - (dow === 0 ? 6 : dow - 1));
-            // Thursday of this week
             const thursdayOfWeek = new Date(mondayOfWeek);
             thursdayOfWeek.setDate(mondayOfWeek.getDate() + 3);
             const thuOfWeek = thursdayOfWeek.getDate();
             const thursdayOfWeekMonth = thursdayOfWeek.getMonth();
             const thursdayOfWeekYear = thursdayOfWeek.getFullYear();
-            const isThuOfWeekESPO = thursdayOfWeekMonth === month && thursdayOfWeekYear === year && espothuSet.has(thuOfWeek);
-            // ESPO: Thu+Fri+Sat+Sun of an ESPO week (Mon AM => Mom resumes)
-            const isESPOWeekDay = isThuOfWeekESPO && (isThursday || isFriday || isSaturday || isSunday);
+            // Is this day's Thursday in espothuSet AND in the same month?
+            const isThuInESPOSet = thursdayOfWeekMonth === month && thursdayOfWeekYear === year && espothuSet.has(thuOfWeek);
+            // Is this day's Thursday one whose weekend belongs to next month? (Apr 30 case)
+            const isThuNextMonthWeekend = thursdayOfWeekMonth !== month || thursdayOfWeekYear !== year;
+            const isThisDayESPO = dowIsESPO && (isThuInESPOSet || isThuNextMonthWeekend);
+            const isThuNonESPO = isThursday && !isThisDayESPO && !isSummerBreak;
             if (isDadSummerDay) {
-                // Dad's 30 consecutive summer days (July 1-30) — overrides everything
                 dayDiv.classList.add('summer-dad');
                 labelDiv.textContent = lang === 'cn' ? '爸爸(暑假30天)' : 'Dad-Sum';
-            } else if (isHoliday && !isESPOWeekDay) {
-                // Summer days not in Dad's 30 → Mom's summer (July 31 + other summer days)
-                dayDiv.classList.add('summer-mom');
+            } else if (isHoliday && !isThisDayESPO) {
+                dayDiv.classList.add('holiday');
                 labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
             } else if (natHoliday) {
                 dayDiv.classList.add('national-holiday');
                 labelDiv.textContent = natHoliday[lang] || natHoliday.en;
-            } else if (isESPOWeekDay) {
-                // School year ESPO weeks: Thu+Fri+Sat+Sun = Dad
+            } else if (isThisDayESPO) {
                 dayDiv.classList.add('dad');
                 if (isThursday) labelDiv.textContent = lang === 'cn' ? '爸爸ESPO' : 'Dad-ESPO';
                 else if (isSunday) labelDiv.textContent = lang === 'cn' ? '爸爸(周一早)' : 'Dad-Sun';
                 else labelDiv.textContent = lang === 'cn' ? '爸爸' : 'Dad';
-            } else if (isThursday && !isSummerBreak) {
-                // Non-ESPO Thursday (week 2 & 4): Dad gets SPO Thu after school - next school day morning
-                // (Only applies during school year; no school = no after-school)
+            } else if (isThuNonESPO) {
                 dayDiv.classList.add('dad-partial');
                 labelDiv.textContent = lang === 'cn' ? '放学后至次日上學' : 'Dad (after school)';
             } else if (isThursday && isSummerBreak) {
-                // Summer: no school, no standard SPO Thu
                 dayDiv.classList.add('mom');
             } else {
                 dayDiv.classList.add('mom');
             }
             daysDiv.appendChild(dayDiv);
+        }
         }
         calDiv.appendChild(daysDiv); rowDiv.appendChild(calDiv);
         month++; monthCount++;
