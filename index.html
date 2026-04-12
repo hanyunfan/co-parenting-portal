@@ -669,8 +669,34 @@ function getWeekdayOccurrence(year, month, targetWeekday) {
     return result;
 }
 
-function isESPOWeek(thursdayOccurrence) {
-    return thursdayOccurrence === 1 || thursdayOccurrence === 3 || thursdayOccurrence === 5;
+// Returns which Friday-of-month number this Thursday belongs to (1-based).
+// A weekend is labeled by the Friday that STARTS it.
+// E.g. May 2026 starts on Fri → first Thu (May 7) has weekend starting Fri May 8 (2nd Fri) → label=2.
+// Aug 2026 starts on Sat → first Thu (Aug 6) has weekend starting Fri Aug 7 (1st Fri) → label=1.
+function getThursdayWeekLabel(thuDate, month, year) {
+    // Find the Friday that starts the weekend for this Thursday
+    const dow = new Date(year, month, thuDate).getDay(); // 0=Sun,3=Thu,4=Fri,5=Sat,6=Sun
+    const mondayOfWeek = new Date(year, month, thuDate);
+    mondayOfWeek.setDate(thuDate - (dow === 0 ? 6 : dow - 1));
+    const friOfWeek = new Date(mondayOfWeek);
+    friOfWeek.setDate(mondayOfWeek.getDate() + 4);
+    const friDay = friOfWeek.getDate();
+    const friMonth = friOfWeek.getMonth();
+    // Count Fridays in this month that are <= friDay
+    let friCount = 0;
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    for (let d = 1; d <= lastDay; d++) {
+        if (new Date(year, month, d).getDay() === 5) {
+            friCount++;
+            if (d === friDay) break; // this is our Friday
+        }
+    }
+    return friCount;
+}
+
+function isESPOWeek(thursdayDate, month, year) {
+    const label = getThursdayWeekLabel(thursdayDate, month, year);
+    return label === 1 || label === 3 || label === 5;
 }
 
 function showCalMode(mode) {
@@ -755,7 +781,7 @@ function generateESPOCalendar(lang) {
         const startPad = firstDay.getDay();
         const thursdays = getWeekdayOccurrence(year, month, 4);
         // Set of dates (day numbers) that are ESPO Thursdays (1st/3rd/5th week)
-        const espothuSet = new Set(thursdays.filter(t => isESPOWeek(t.occurrence)).map(t => t.date));
+        const espothuSet = new Set(thursdays.filter(t => isESPOWeek(t.date, month, year)).map(t => t.date));
         for (let i = 0; i < startPad; i++) { const empty = document.createElement('div'); empty.className = 'cal-day other-month'; empty.innerHTML = '<div class="day-num"></div>'; daysDiv.appendChild(empty); }
         for (let d = 1; d <= lastDay.getDate(); d++) {
             const dow = new Date(year, month, d).getDay(); // 0=Sun,1=Mon,...,6=Sat
