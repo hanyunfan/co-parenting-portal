@@ -162,7 +162,7 @@
 
                 <div class="schedule-block">
                     <h3 id="extendedTimeTitle">Extended Possession (ESPO)</h3>
-                    <p id="extendedDad">Father: 1st, 3rd, 5th week Thu after school – Sun 6 PM + 30 days summer; plus every Thu 6-8 PM on weeks 2 & 4</p>
+                    <p id="extendedDad">Father: 1st/3rd/5th Thu after school–Sun 6PM (+ Mon AM if no school) + 30 consecutive days summer (Jul 1-30, default). Weeks 2 &amp; 4: every Thu after school (SPO). Mother: spring/winter break first half; summer remaining days (Jul 31 + Aug 1-2).</p>
                     <p id="extendedMom" style="margin-top:8px;">Mother: Remainder of time</p>
                 </div>
 
@@ -458,7 +458,7 @@ const i18n = {
         standardDad: 'Father: Every Thursday 6:00 PM - 8:00 PM',
         standardMom: 'Mother: All other times (primary residence)',
         extendedTimeTitle: 'Extended Possession (ESPO)',
-        extendedDad: 'Father: 1st, 3rd, 5th week Thu after school - Sun 6PM (+ Mon AM if school off) + 30 consecutive days in summer; weeks 2 & 4: every Thu 6PM-8PM (standard SPO)',
+        extendedDad: 'Father: 1st/3rd/5th week Thu after school-Sun 6PM (+ Mon AM if school off) + 30 consecutive days in summer (Jul 1-30, default); weeks 2 & 4: every Thu after school (standard SPO). Mother: spring/winter break first half; summer remaining days (Jul 31 + Aug 1-2).',
         extendedMom: 'Mother: Remainder of time',
         holidaysTitle: 'Holiday Schedule',
         holidaysDesc: 'Parents alternate major holidays each year (see §153.314). National holidays marked on calendar in orange.',
@@ -504,7 +504,7 @@ const i18n = {
         standardDad: '父亲:每周四下午 6:00 - 8:00',
         standardMom: '母亲:其他所有时间(主要居住地)',
         extendedTimeTitle: '扩展探视 (ESPO)',
-        extendedDad: '父亲:每月第1、3、5周周四放学后 - 周一早上送孩子上学 + 夏季30天',
+        extendedDad: '父亲:第1/3/5周周四放学后至周日6点(+周一早如果学校不上课)+夏季30天(默认7月1-30日);第2/4周:每周四放学后(标准SPO).母亲:春假/寒假前半段;暑假剩余天数(7月31日+8月1-2日).',
         extendedMom: '母亲:其余时间',
         holidaysTitle: '节假日安排',
         holidaysDesc: '父母轮流过节（见§153.314）。美国法定节假日用橙色标注。',
@@ -720,8 +720,7 @@ function generateSPOCalendar(lang) {
     const container = document.getElementById('spoContainer');
     container.innerHTML = '';
     const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const startYear = 2026, startMonth = 3;
-    const endYear = 2027, endMonth = 4;
+    const startYear = 2026, startMonth = 3; const endYear = 2027, endMonth = 7;
     let year = startYear, month = startMonth;
     let rowDiv = null, monthCount = 0;
     while (year < endYear || (year === endYear && month <= endMonth)) {
@@ -768,13 +767,41 @@ function generateSPOCalendar(lang) {
     }
 }
 
-// ESPO Calendar: Extended Possession — 1st/3rd/5th Thu after school to Sun 6PM + 30 days summer + every Thu 6-8PM on weeks 2 & 4
+// Returns 'dad' or 'mom' for school break days, or 'none' if not a break.
+// Spring/Winter breaks: split evenly, Mom gets first half, Dad second half.
+// Summer: handled separately via isDadSummerDay / isMomSummerDay.
+function getSchoolBreakCustody(dateStr) {
+    const d = new Date(dateStr);
+    // RRISD Spring Break 2027: March 15-19
+    if (d >= new Date(2027, 2, 15) && d <= new Date(2027, 2, 19)) {
+        // 5 days: Mom gets 3 (Mon-Wed), Dad gets 2 (Thu-Fri)
+        const dayOfBreak = Math.floor((d - new Date(2027, 2, 15)) / (1000*60*60*24));
+        return dayOfBreak < 3 ? 'mom' : 'dad';
+    }
+    // RRISD Winter Break 2026-2027: Dec 18 - Jan 3 (17 days)
+    // Split: Mom gets Dec 18-25 (8 days), Dad gets Dec 26 - Jan 3 (9 days)
+    const winStart = new Date(2026, 11, 18); // Dec 18
+    const winEnd = new Date(2027, 0, 3);      // Jan 3
+    if (d >= winStart && d <= winEnd) {
+        const dayOfBreak = Math.floor((d - winStart) / (1000*60*60*24));
+        return dayOfBreak < 8 ? 'mom' : 'dad';
+    }
+    return 'none';
+}
+
+function isMomSummerDay(day, month, year) {
+    // Mom's remaining summer days: July 31 + Aug 1-2 (after Dad's 30 days)
+    if (month === 6 && day === 31) return true; // July 31
+    if (month === 7 && day >= 1 && day <= 2) return true; // Aug 1-2
+    return false;
+}
+
+ — 1st/3rd/5th Thu after school to Sun 6PM + 30 days summer + every Thu 6-8PM on weeks 2 & 4
 function generateESPOCalendar(lang) {
     const container = document.getElementById('espoContainer');
     container.innerHTML = '';
     const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    const startYear = 2026, startMonth = 3;
-    const endYear = 2027, endMonth = 4;
+    const startYear = 2026, startMonth = 3; const endYear = 2027, endMonth = 7;
     let year = startYear, month = startMonth;
     let rowDiv = null, monthCount = 0;
     while (year < endYear || (year === endYear && month <= endMonth)) {
@@ -805,6 +832,9 @@ function generateESPOCalendar(lang) {
             // Summer break: ESPO pauses, Dad gets 30 consecutive days (July 1-30)
             const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
             const isDadSummerDay = isSummerBreak && (month === 6 && d >= 1 && d <= 30);
+            const isMomSummerDay_val = isSummerBreak && isMomSummerDay(d, month, year);
+            // School break custody: Mom first half, Dad second half (overrides ESPO)
+            const breakCustody = isHoliday ? getSchoolBreakCustody(dateStr) : 'none';
             // This day's weekend is ESPO if:
             //   - It is Thu/Fri/Sat/Sun AND its Thursday is in espothuSet (1st/3rd/5th Thu of month)
             //   - OR its Thursday belongs to Weekend 1 of NEXT month (e.g. Apr 30)
@@ -821,13 +851,17 @@ function generateESPOCalendar(lang) {
             const isThuInESPOSet = thursdayOfWeekMonth === month && thursdayOfWeekYear === year && espothuSet.has(thuOfWeek);
             // Is this day's Thursday one whose weekend belongs to next month? (Apr 30 case)
             const isThuNextMonthWeekend = thursdayOfWeekMonth !== month || thursdayOfWeekYear !== year;
-            const isThisDayESPO = dowIsESPO && (isThuInESPOSet || isThuNextMonthWeekend);
-            const isThuNonESPO = isThursday && !isThisDayESPO && !isSummerBreak;
+            const isThisDayESPO = (isHoliday && breakCustody !== 'none') ? false : (dowIsESPO && (isThuInESPOSet || isThuNextMonthWeekend));
+            const isThuNonESPO = isThursday && !isThisDayESPO && !isSummerBreak && !isHoliday;
+            // Priority: 1) Dad summer 30 days, 2) Mom summer remaining, 3) school break split, 4) nat holiday, 5) ESPO/partial
             if (isDadSummerDay) {
                 dayDiv.classList.add('summer-dad');
                 labelDiv.textContent = lang === 'cn' ? '爸爸(暑假30天)' : 'Dad-Sum';
-            } else if (isHoliday && !isThisDayESPO) {
-                dayDiv.classList.add('holiday');
+            } else if (isMomSummerDay_val) {
+                dayDiv.classList.add('summer-mom');
+                labelDiv.textContent = lang === 'cn' ? '妈妈(暑假剩余)' : 'Mom-Sum';
+            } else if (isHoliday) {
+                dayDiv.classList.add(breakCustody === 'mom' ? 'mom' : 'dad');
                 labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
             } else if (natHoliday) {
                 dayDiv.classList.add('national-holiday');
@@ -840,8 +874,6 @@ function generateESPOCalendar(lang) {
             } else if (isThuNonESPO) {
                 dayDiv.classList.add('dad-partial');
                 labelDiv.textContent = lang === 'cn' ? '放学后至次日上學' : 'Dad (after school)';
-            } else if (isThursday && isSummerBreak) {
-                dayDiv.classList.add('mom');
             } else {
                 dayDiv.classList.add('mom');
             }
