@@ -811,8 +811,10 @@ function getMothersDayWeekend(dateStr) {
 
 // Christmas: even yr Dad Dec18noon-Dec28noon, then Mom; odd yr swap
 function getChristmasCustody(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
+    // Parse date in LOCAL timezone to avoid UTC midnight shift issues
+    const [y, m, day] = dateStr.split('-').map(Number);
+    const d = new Date(y, m - 1, day); // local midnight
+    const yr = m === 1 ? y - 1 : y;
     // Christmas season: Dec 18 of yr → Jan 3 of yr+1
     const winStart = new Date(yr, 11, 18);
     const winEnd = new Date(yr + 1, 0, 3);
@@ -825,40 +827,55 @@ function getChristmasCustody(dateStr) {
 
 // Thanksgiving: odd yr Dad, even yr Mom
 function getThanksgivingCustody(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
+    // Parse in LOCAL time to avoid UTC midnight-shift
+    const [y, m, day] = dateStr.split('-').map(Number);
+    const d = new Date(y, m - 1, day);
+    const yr = y;
+    // Thanksgiving = 4th Thu of November
+    // RRISD break: Mon before → Sun after
     const tgBreaks = [
-        { start: '2025-11-24', end: '2025-11-30' },
-        { start: '2026-11-23', end: '2026-11-29' }
+        { start: '2025-11-24', end: '2025-11-30' }, // Mon Nov 24 - Sun Nov 30
+        { start: '2026-11-23', end: '2026-11-29' }, // Mon Nov 23 - Sun Nov 29
+        { start: '2027-11-22', end: '2027-11-28' }  // Mon Nov 22 - Sun Nov 28
     ];
     for (const tb of tgBreaks) {
-        if (d >= new Date(tb.start) && d <= new Date(tb.end)) return yr % 2 === 1 ? 'dad' : 'mom';
+        const [sy, sm, sd] = tb.start.split('-').map(Number);
+        const [ey, em, ed] = tb.end.split('-').map(Number);
+        const start = new Date(sy, sm - 1, sd);
+        const end = new Date(ey, em - 1, ed);
+        if (d >= start && d <= end) return yr % 2 === 1 ? 'dad' : 'mom';
     }
     return 'none';
 }
 
 function getSchoolBreakCustody(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
+    // Parse in LOCAL time
+    const [y, m, day] = dateStr.split('-').map(Number);
+    const d = new Date(y, m - 1, day);
+    const yr = m === 1 ? y - 1 : y;
     // ---- SPRING BREAK ---- §153.312(b)(1): Even yr = Dad entire; Odd yr = Mom entire
     const springBreaks = [
         { start: '2026-03-16', end: '2026-03-20' },
         { start: '2027-03-15', end: '2027-03-19' }
     ];
     for (const sb of springBreaks) {
-        if (d >= new Date(sb.start) && d <= new Date(sb.end)) {
+        const [sy, sm, sd] = sb.start.split('-').map(Number);
+        const [ey, em, ed] = sb.end.split('-').map(Number);
+        const start = new Date(sy, sm - 1, sd);
+        const end = new Date(ey, em - 1, ed);
+        if (d >= start && d <= end) {
             return yr % 2 === 0 ? 'dad' : 'mom';
         }
     }
     // ---- WINTER BREAK ----
-    // RRISD Winter Break 2026-2027: Dec 18 - Jan 3 (17 days)
-    const winStart = new Date(2026, 11, 18); // Dec 18
-    const winEnd = new Date(2027, 0, 3);     // Jan 3
+    // RRISD Winter Break: Dec 18 - Jan 3
+    // Even yr = Dad Dec 18-28, Mom Dec 29 - Jan 3; Odd yr = opposite
+    const winStart = new Date(yr, 11, 18);  // Dec 18 of year yr
+    const winEnd = new Date(yr + 1, 0, 3);  // Jan 3 of year yr+1
     if (d >= winStart && d <= winEnd) {
-        const totalDays = Math.floor((winEnd - winStart) / (1000*60*60*24)) + 1; // 17
-        const halfLen = Math.floor(totalDays / 2); // 8
-        const dayOfBreak = Math.floor((d - winStart) / (1000*60*60*24));
-        return yr % 2 === 0 ? (dayOfBreak < halfLen ? 'dad' : 'mom') : (dayOfBreak < halfLen ? 'mom' : 'dad');
+        const dec28 = new Date(yr, 11, 28);
+        if (d <= dec28) return yr % 2 === 0 ? 'dad' : 'mom'; // Dec 18-28
+        return yr % 2 === 0 ? 'mom' : 'dad';                   // Dec 29 - Jan 3
     }
     return 'none';
 }
