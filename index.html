@@ -615,61 +615,36 @@ function isNationalHoliday(year, month, day) {
 }
 
 const schoolBreaks = [
-    // ===== RISD 2025-2026 =====  Aug 13 2025 - May 21 2026 (confirmed: Educounty + Community Impact)
-    { start: '2025-08-13', end: '2025-08-13', label: { en: 'School Year Begins', cn: '开学' } },
-    { start: '2025-09-01', end: '2025-09-01', label: { en: 'Labor Day', cn: '劳动节' } },  // Mon
-    { start: '2025-09-22', end: '2025-09-22', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2025-10-13', end: '2025-10-13', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2025-10-20', end: '2025-10-20', label: { en: 'Student Holiday', cn: '学生假日' } },
-    // Fall/Thanksgiving Break: Mon Nov 24 - Fri Nov 28 2025 (RRISD 5-day break)
-    // Christmas custody: Dec 18 - Jan 3. RISD winter break: Dec 22 - Jan 2.
+    // ===== RISD 2025-2026 =====  Aug 13 2025 - May 21 2026
+    // Fall/Thanksgiving Break: Mon Nov 24 - Fri Nov 28 2025
     { start: '2025-11-24', end: '2025-11-28', label: { en: 'Fall Break', cn: '秋假' } },
-    { start: '2025-12-22', end: '2026-01-02', label: { en: 'Winter Break', cn: '寒假' } },  // school resumes Jan 6
-    { start: '2026-01-19', end: '2026-01-19', label: { en: 'MLK Day', cn: '马丁路德金日' } },  // Mon
-    { start: '2026-02-13', end: '2026-02-13', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2026-02-16', end: '2026-02-16', label: { en: "President's Day", cn: '总统日' } },  // Mon
+    // Winter Break: Dec 22 2025 - Jan 2 2026 (school resumes Jan 6)
+    { start: '2025-12-22', end: '2026-01-02', label: { en: 'Winter Break', cn: '寒假' } },
+    // Spring Break: Mar 16-20 2026
     { start: '2026-03-16', end: '2026-03-20', label: { en: 'Spring Break', cn: '春假' } },
-    { start: '2026-04-03', end: '2026-04-03', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2026-04-06', end: '2026-04-06', label: { en: 'Student Holiday', cn: '学生假日' } },
-    // Summer: day after last day (May 21) = May 22, until day before first day (Aug 13) = Aug 12
+    // Summer Break: May 22 - Aug 12 2026 (school resumes Aug 13)
     { start: '2026-05-22', end: '2026-08-12', label: { en: 'Summer Break', cn: '暑假' } },
 
-    // ===== RRISD 2026-2027 =====  Aug 18 2026 - May 27 2027 (RRISD official calendar)
-    { start: '2026-08-18', end: '2026-08-18', label: { en: 'School Year Begins', cn: '开学' } },
-    { start: '2026-09-04', end: '2026-09-04', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2026-09-07', end: '2026-09-07', label: { en: 'Labor Day', cn: '劳动节' } },
-    { start: '2026-09-21', end: '2026-09-21', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2026-10-12', end: '2026-10-12', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2026-10-19', end: '2026-10-19', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2026-11-09', end: '2026-11-09', label: { en: 'Student Holiday', cn: '学生假日' } },
+    // ===== RRISD 2026-2027 =====  Aug 18 2026 - May 27 2027
+    // Fall/Thanksgiving Break: Mon Nov 23 - Fri Nov 27 2026
     { start: '2026-11-23', end: '2026-11-27', label: { en: 'Fall Break', cn: '秋假' } },
-    // Dec 17=last day; Dec 18=Teacher Work Day; Winter break Dec 21 - Jan 4 (school resumes Jan 5)
-    { start: '2026-12-18', end: '2026-12-18', label: { en: 'Teacher Work Day', cn: '教师工作日' } },
+    // Winter Break: Dec 21 2026 - Jan 4 2027 (school resumes Jan 5)
+    // Note: Dec 18 is Teacher Work Day (not a break), Dec 17 is last day of school
     { start: '2026-12-21', end: '2027-01-04', label: { en: 'Winter Break', cn: '寒假' } },
-    { start: '2027-01-18', end: '2027-01-18', label: { en: 'MLK Day', cn: '马丁路德金日' } },
-    { start: '2027-02-05', end: '2027-02-05', label: { en: 'Student Holiday', cn: '学生假日' } },
-    { start: '2027-02-15', end: '2027-02-15', label: { en: "President's Day", cn: '总统日' } },
-    { start: '2027-03-10', end: '2027-03-10', label: { en: 'Student Holiday', cn: '学生假日' } },
+    // Spring Break: Mar 15-19 2027
     { start: '2027-03-15', end: '2027-03-19', label: { en: 'Spring Break', cn: '春假' } },
-    { start: '2027-03-26', end: '2027-03-26', label: { en: 'Student Holiday', cn: '学生假日' } },
-    // Last day May 27; Summer: May 28 - Aug 16 (school resumes Aug 17)
+    // Summer Break: May 28 - Aug 16 2027 (school resumes Aug 17)
     { start: '2027-05-28', end: '2027-08-16', label: { en: 'Summer Break', cn: '暑假' } },
 
-    // ===== RISD 2027-2028 =====  (board approved Rev 6.24.25; exact dates TBD from PDF)
-    // First day: TBD (pending PDF extraction). Summer ends day before first day.
-    // { start: '2027-08-XX', end: '2027-08-XX', label: { en: 'School Year Begins', cn: '开学' } },
-    { start: '2027-09-06', end: '2027-09-06', label: { en: 'Labor Day', cn: '劳动节' } },  // Mon
-    // Fall Break: estimated Mon Nov 22 - Fri Nov 26 2027
+    // ===== RISD 2027-2028 =====  (estimated - board approved Rev 6.24.25)
+    // Fall/Thanksgiving Break: estimated Mon Nov 22 - Fri Nov 26 2027
     { start: '2027-11-22', end: '2027-11-26', label: { en: 'Fall Break', cn: '秋假' } },
-    // Winter Break: estimated Dec 20 - Jan 4 (school resumes Jan 5 2028)
+    // Winter Break: estimated Dec 20 2027 - Jan 4 2028 (school resumes Jan 5)
     { start: '2027-12-20', end: '2028-01-04', label: { en: 'Winter Break', cn: '寒假' } },
-    { start: '2028-01-17', end: '2028-01-17', label: { en: 'MLK Day', cn: '马丁路德金日' } },  // Mon
-    { start: '2028-02-14', end: '2028-02-14', label: { en: "President's Day", cn: '总统日' } },  // Mon
-    { start: '2028-03-13', end: '2028-03-17', label: { en: 'Spring Break', cn: '春假' } },  // tentative
-    // Summer: May 25 (day after May 24) - Aug 15 (day before estimated Aug 16 first day)
+    // Spring Break: estimated Mar 13-17 2028
+    { start: '2028-03-13', end: '2028-03-17', label: { en: 'Spring Break', cn: '春假' } },
+    // Summer Break: May 25 - Aug 15 2028 (estimated; school resumes Aug 16)
     { start: '2028-05-25', end: '2028-08-15', label: { en: 'Summer Break', cn: '暑假' } },
-    // First day of school: estimated Aug 16 2028 (board approved calendar, dates TBD)
-    { start: '2028-08-16', end: '2028-08-16', label: { en: 'School Year Begins', cn: '开学' } },
 ];
 
 function isSchoolBreak(dateStr) {
