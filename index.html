@@ -828,25 +828,27 @@ function getThanksgivingCustody(dateStr) {
     return 'none';
 }
 
-// Father's Day: 3rd Sunday of June, Dad gets Fri 6pm - Sun 6pm
+// Father's Day: 3rd Sunday of June, Dad gets Fri-Sat-Sun of that weekend
 function getFathersDayWeekend(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
+    const yr = new Date(dateStr).getFullYear();
     let sundays = 0, thirdSun = null;
     for (let dd = 1; dd <= 30; dd++) {
         const dt = new Date(yr, 5, dd);
         if (dt.getDay() === 0) { sundays++; if (sundays === 3) { thirdSun = dt; break; } }
     }
     if (!thirdSun) return false;
+    const m = String(6).padStart(2, '0');
+    const sunStr = yr + '-' + m + '-' + String(thirdSun.getDate()).padStart(2, '0');
     const fri = new Date(thirdSun); fri.setDate(thirdSun.getDate() - 2);
-    const sun = thirdSun;
-    return d >= new Date(fri.getFullYear(), fri.getMonth(), fri.getDate(), 18, 0, 0) && d <= new Date(sun.getFullYear(), sun.getMonth(), sun.getDate(), 18, 0, 0);
+    const friStr = yr + '-' + m + '-' + String(fri.getDate()).padStart(2, '0');
+    const sat = new Date(thirdSun); sat.setDate(thirdSun.getDate() - 1);
+    const satStr = yr + '-' + m + '-' + String(sat.getDate()).padStart(2, '0');
+    return dateStr === friStr || dateStr === satStr || dateStr === sunStr;
 }
 
-// Mother's Day: 2nd Sunday of May, Mom gets Fri 6pm - Sun 6pm
+// Mother's Day: 2nd Sunday of May, Mom gets Fri-Sat-Sun of that weekend
 function getMothersDayWeekend(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
+    const yr = new Date(dateStr).getFullYear();
     let sundays = 0, secondSun = null;
     for (let dd = 1; dd <= 31; dd++) {
         const dt = new Date(yr, 4, dd);
@@ -854,9 +856,13 @@ function getMothersDayWeekend(dateStr) {
         if (dt.getDay() === 0) { sundays++; if (sundays === 2) { secondSun = dt; break; } }
     }
     if (!secondSun) return false;
+    const m = String(5).padStart(2, '0');
+    const sunStr = yr + '-' + m + '-' + String(secondSun.getDate()).padStart(2, '0');
     const fri = new Date(secondSun); fri.setDate(secondSun.getDate() - 2);
-    const sun = secondSun;
-    return d >= new Date(fri.getFullYear(), fri.getMonth(), fri.getDate(), 18, 0, 0) && d <= new Date(sun.getFullYear(), sun.getMonth(), sun.getDate(), 18, 0, 0);
+    const friStr = yr + '-' + m + '-' + String(fri.getDate()).padStart(2, '0');
+    const sat = new Date(secondSun); sat.setDate(secondSun.getDate() - 1);
+    const satStr = yr + '-' + m + '-' + String(sat.getDate()).padStart(2, '0');
+    return dateStr === friStr || dateStr === satStr || dateStr === sunStr;
 }
 
 // Christmas: even yr Dad Dec18noon-Dec28noon, then Mom; odd yr swap
