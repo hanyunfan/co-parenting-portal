@@ -208,7 +208,7 @@
                     <div class="legend-item"><div class="legend-color holiday-yellow"></div><span id="legendHoliday">School Break</span></div>
                     <div class="legend-item"><div class="legend-color national-holiday"></div><span id="legendNational">National Holiday</span></div>
                     <div class="legend-item"><div class="legend-color fdmd-pink"></div><span id="legendFDMD">Father's/Mother's Day</span></div>
-                    <div class="legend-item"><div class="legend-color summer-purple"></div><span id="legendSummer">Summer (Mom start, Dad Jul 1-30, Mom rest)</span></div>
+                    <div class="legend-item"><div class="legend-color summer-purple"></div><span id="legendSummer">Summer (Mom: day after school ends → Jun 30 + Jul 31 - school resume; Dad: Jul 1-30)</span></div>
                 </div>
             </div>
         </div>
@@ -615,23 +615,61 @@ function isNationalHoliday(year, month, day) {
 }
 
 const schoolBreaks = [
-    // 2025-2026
-    { start: '2025-08-25', end: '2025-08-31', label: { en: 'School Year Begins', cn: '开学' } },
-    { start: '2025-09-01', end: '2025-09-01', label: { en: 'Labor Day', cn: '劳动节' } },
-    { start: '2025-11-24', end: '2025-11-25', label: { en: 'Thanksgiving', cn: '感恩节' } },
-    { start: '2025-12-22', end: '2026-01-04', label: { en: 'Winter Break', cn: '寒假' } },
-    { start: '2026-01-19', end: '2026-01-19', label: { en: 'MLK Day', cn: '马丁路德金日' } },
-    { start: '2026-02-16', end: '2026-02-16', label: { en: "President's Day", cn: '总统日' } },
+    // ===== RISD 2025-2026 =====  Aug 13 2025 - May 21 2026 (confirmed: Educounty + Community Impact)
+    { start: '2025-08-13', end: '2025-08-13', label: { en: 'School Year Begins', cn: '开学' } },
+    { start: '2025-09-01', end: '2025-09-01', label: { en: 'Labor Day', cn: '劳动节' } },  // Mon
+    { start: '2025-09-22', end: '2025-09-22', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2025-10-13', end: '2025-10-13', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2025-10-20', end: '2025-10-20', label: { en: 'Student Holiday', cn: '学生假日' } },
+    // Fall/Thanksgiving Break: Mon Nov 24 - Fri Nov 28 2025 (RRISD 5-day break)
+    // Christmas custody: Dec 18 - Jan 3. RISD winter break: Dec 22 - Jan 2.
+    { start: '2025-11-24', end: '2025-11-28', label: { en: 'Fall Break', cn: '秋假' } },
+    { start: '2025-12-22', end: '2026-01-02', label: { en: 'Winter Break', cn: '寒假' } },  // school resumes Jan 6
+    { start: '2026-01-19', end: '2026-01-19', label: { en: 'MLK Day', cn: '马丁路德金日' } },  // Mon
+    { start: '2026-02-13', end: '2026-02-13', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2026-02-16', end: '2026-02-16', label: { en: "President's Day", cn: '总统日' } },  // Mon
     { start: '2026-03-16', end: '2026-03-20', label: { en: 'Spring Break', cn: '春假' } },
-    { start: '2026-05-28', end: '2026-08-16', label: { en: 'Summer Break', cn: '暑假' } },
-    // 2026-2027
-    { start: '2026-08-17', end: '2026-08-17', label: { en: 'School Year Begins', cn: '开学' } },
-    { start: '2026-09-04', end: '2026-09-04', label: { en: 'Labor Day', cn: '劳动节' } },
-    { start: '2026-12-18', end: '2027-01-03', label: { en: 'Winter Break', cn: '寒假' } },
+    { start: '2026-04-03', end: '2026-04-03', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2026-04-06', end: '2026-04-06', label: { en: 'Student Holiday', cn: '学生假日' } },
+    // Summer: day after last day (May 21) = May 22, until day before first day (Aug 13) = Aug 12
+    { start: '2026-05-22', end: '2026-08-12', label: { en: 'Summer Break', cn: '暑假' } },
+
+    // ===== RRISD 2026-2027 =====  Aug 18 2026 - May 27 2027 (RRISD official calendar)
+    { start: '2026-08-18', end: '2026-08-18', label: { en: 'School Year Begins', cn: '开学' } },
+    { start: '2026-09-04', end: '2026-09-04', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2026-09-07', end: '2026-09-07', label: { en: 'Labor Day', cn: '劳动节' } },
+    { start: '2026-09-21', end: '2026-09-21', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2026-10-12', end: '2026-10-12', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2026-10-19', end: '2026-10-19', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2026-11-09', end: '2026-11-09', label: { en: 'Student Holiday', cn: '学生假日' } },
+    { start: '2026-11-23', end: '2026-11-27', label: { en: 'Fall Break', cn: '秋假' } },
+    // Dec 17=last day; Dec 18=Teacher Work Day; Winter break Dec 21 - Jan 4 (school resumes Jan 5)
+    { start: '2026-12-18', end: '2026-12-18', label: { en: 'Teacher Work Day', cn: '教师工作日' } },
+    { start: '2026-12-21', end: '2027-01-04', label: { en: 'Winter Break', cn: '寒假' } },
     { start: '2027-01-18', end: '2027-01-18', label: { en: 'MLK Day', cn: '马丁路德金日' } },
+    { start: '2027-02-05', end: '2027-02-05', label: { en: 'Student Holiday', cn: '学生假日' } },
     { start: '2027-02-15', end: '2027-02-15', label: { en: "President's Day", cn: '总统日' } },
+    { start: '2027-03-10', end: '2027-03-10', label: { en: 'Student Holiday', cn: '学生假日' } },
     { start: '2027-03-15', end: '2027-03-19', label: { en: 'Spring Break', cn: '春假' } },
-    { start: '2027-05-27', end: '2027-08-15', label: { en: 'Summer Break', cn: '暑假' } },
+    { start: '2027-03-26', end: '2027-03-26', label: { en: 'Student Holiday', cn: '学生假日' } },
+    // Last day May 27; Summer: May 28 - Aug 16 (school resumes Aug 17)
+    { start: '2027-05-28', end: '2027-08-16', label: { en: 'Summer Break', cn: '暑假' } },
+
+    // ===== RISD 2027-2028 =====  (board approved Rev 6.24.25; exact dates TBD from PDF)
+    // First day: TBD (pending PDF extraction). Summer ends day before first day.
+    // { start: '2027-08-XX', end: '2027-08-XX', label: { en: 'School Year Begins', cn: '开学' } },
+    { start: '2027-09-06', end: '2027-09-06', label: { en: 'Labor Day', cn: '劳动节' } },  // Mon
+    // Fall Break: estimated Mon Nov 22 - Fri Nov 26 2027
+    { start: '2027-11-22', end: '2027-11-26', label: { en: 'Fall Break', cn: '秋假' } },
+    // Winter Break: estimated Dec 20 - Jan 4 (school resumes Jan 5 2028)
+    { start: '2027-12-20', end: '2028-01-04', label: { en: 'Winter Break', cn: '寒假' } },
+    { start: '2028-01-17', end: '2028-01-17', label: { en: 'MLK Day', cn: '马丁路德金日' } },  // Mon
+    { start: '2028-02-14', end: '2028-02-14', label: { en: "President's Day", cn: '总统日' } },  // Mon
+    { start: '2028-03-13', end: '2028-03-17', label: { en: 'Spring Break', cn: '春假' } },  // tentative
+    // Summer: May 25 (day after May 24) - Aug 15 (day before estimated Aug 16 first day)
+    { start: '2028-05-25', end: '2028-08-15', label: { en: 'Summer Break', cn: '暑假' } },
+    // First day of school: estimated Aug 16 2028 (board approved calendar, dates TBD)
+    { start: '2028-08-16', end: '2028-08-16', label: { en: 'School Year Begins', cn: '开学' } },
 ];
 
 function isSchoolBreak(dateStr) {
@@ -831,19 +869,29 @@ function getThanksgivingCustody(dateStr) {
     const [y, m, day] = dateStr.split('-').map(Number);
     const d = new Date(y, m - 1, day);
     const yr = y;
-    // Thanksgiving = 4th Thu of November
-    // RRISD break: Mon before → Sun after
+    // RRISD Fall/Thanksgiving Break — 5-day breaks (Mon-Fri)
+    // Odd years (2025, 2027): Dad gets first 3 days (Mon-Wed), Mom gets last 2 days (Thu-Fri)
+    // Even years (2026): Mom gets first 3 days (Mon-Wed), Dad gets last 2 days (Thu-Fri)
     const tgBreaks = [
-        { start: '2025-11-24', end: '2025-11-30' }, // Mon Nov 24 - Sun Nov 30
-        { start: '2026-11-23', end: '2026-11-29' }, // Mon Nov 23 - Sun Nov 29
-        { start: '2027-11-22', end: '2027-11-28' }  // Mon Nov 22 - Sun Nov 28
+        { start: '2025-11-24', end: '2025-11-28' }, // 5 days: 3 Dad, 2 Mom
+        { start: '2026-11-23', end: '2026-11-27' }, // 5 days: 3 Mom, 2 Dad
+        { start: '2027-11-22', end: '2027-11-26' }  // 5 days: 3 Dad, 2 Mom
     ];
     for (const tb of tgBreaks) {
         const [sy, sm, sd] = tb.start.split('-').map(Number);
         const [ey, em, ed] = tb.end.split('-').map(Number);
         const start = new Date(sy, sm - 1, sd);
         const end = new Date(ey, em - 1, ed);
-        if (d >= start && d <= end) return yr % 2 === 1 ? 'dad' : 'mom';
+        if (d >= start && d <= end) {
+            const totalDays = Math.round((end - start) / 86400000) + 1; // inclusive
+            const dayIndex = Math.round((d - start) / 86400000);        // 0-based
+            const midpoint = (totalDays - 1) / 2;
+            if (yr % 2 === 1) {
+                return dayIndex <= midpoint ? 'dad' : 'mom'; // odd → Dad first
+            } else {
+                return dayIndex <= midpoint ? 'mom' : 'dad'; // even → Mom first
+            }
+        }
     }
     return 'none';
 }
@@ -855,8 +903,9 @@ function getSchoolBreakCustody(dateStr) {
     const yr = m === 1 ? y - 1 : y;
     // ---- SPRING BREAK ---- §153.312(b)(1): Even yr = Dad entire; Odd yr = Mom entire
     const springBreaks = [
-        { start: '2026-03-16', end: '2026-03-20' },
-        { start: '2027-03-15', end: '2027-03-19' }
+        { start: '2026-03-16', end: '2026-03-20' }, // RISD 2025-26
+        { start: '2027-03-15', end: '2027-03-19' }, // RISD 2026-27 (tentative)
+        { start: '2028-03-13', end: '2028-03-17' }  // RISD 2027-28 (tentative)
     ];
     for (const sb of springBreaks) {
         const [sy, sm, sd] = sb.start.split('-').map(Number);
@@ -867,9 +916,11 @@ function getSchoolBreakCustody(dateStr) {
             return yr % 2 === 0 ? 'dad' : 'mom';
         }
     }
-    // ---- WINTER BREAK ----
-    // RRISD Winter Break: Dec 18 - Jan 3
+    // ---- WINTER BREAK / CHRISTMAS ----
+    // §153.314: Parents alternate the winter break period (when school is not in session)
     // Even yr = Dad Dec 18-28, Mom Dec 29 - Jan 3; Odd yr = opposite
+    // Christmas season: Dec 18 of year Y → Jan 3 of year Y+1
+    // (RISD 2025-26 break: Dec 22-Jan 2; RISD 2026-27: Dec 21-Jan 5; RISD 2027-28: Dec 20-Jan 4)
     const winStart = new Date(yr, 11, 18);  // Dec 18 of year yr
     const winEnd = new Date(yr + 1, 0, 3);  // Jan 3 of year yr+1
     if (d >= winStart && d <= winEnd) {
@@ -885,17 +936,29 @@ function getSchoolBreakCustody(dateStr) {
 // Summer break is May 28 - Aug 16 (RRISD 2025-2026) / May 27 - Aug 15 (RRISD 2026-2027).
 // Dad's 30 days: July 1-30 each year. Mom gets July 31 through day before school starts.
 function isMomSummerDay(day, month0, year) {
-    // Summer 2026 (May 28-Aug 16): Dad Jul 1-30, Mom rest
-    // Summer 2027 (May 27-Aug 15): Dad Jul 1-30, Mom rest
-    const isSummer2026 = (year === 2026 && month0 === 4 && day >= 28)
-                      || (year === 2026 && month0 === 5)
-                      || (year === 2026 && month0 === 6 && day >= 31);
-    const isSummer2027 = (year === 2027 && month0 === 4 && day >= 27)
-                      || (year === 2027 && month0 === 5)
-                      || (year === 2027 && month0 === 6 && day >= 31);
-    if (!isSummer2026 && !isSummer2027) return false;
-    if (month0 === 6 && day >= 1 && day <= 30) return false; // Dad: Jul 1-30
-    return true; // Mom: summer start→Jun30 + Jul31+→summer end
+    // RISD 2025-26: last day May 21 → summer May 22 - Aug 11 (school resumes Aug 12)
+    // RISD 2026-27: last day May 27 → summer May 28 - Aug 17 (school resumes Aug 18)
+    // RISD 2027-28: last day May 24 → summer May 25 - Aug 10 (school resumes Aug 11)
+    // Dad: July 1-30 (30 consecutive days) every year
+    // Mom: summer start → Jun 30 + Jul 31 → end of summer (Aug 11/17/10)
+    const isSummer2025_26 =
+        (year === 2026 && month0 === 4 && day >= 22)  // May 22-30
+     || (year === 2026 && month0 === 5)               // all June
+     || (year === 2026 && month0 === 6 && day >= 31)  // July 31
+     || (year === 2026 && month0 === 7 && day <= 12);  // Aug 1-11
+    const isSummer2026_27 =
+        (year === 2027 && month0 === 4 && day >= 28)  // May 28-31
+     || (year === 2027 && month0 === 5)               // all June
+     || (year === 2027 && month0 === 6 && day >= 31)  // July 31
+     || (year === 2027 && month0 === 7 && day <= 16); // Aug 1-17
+    const isSummer2027_28 =
+        (year === 2028 && month0 === 4 && day >= 25)  // May 25-31
+     || (year === 2028 && month0 === 5)               // all June
+     || (year === 2028 && month0 === 6 && day >= 31)  // July 31
+     || (year === 2028 && month0 === 7 && day <= 10); // Aug 1-10
+    if (!isSummer2025_26 && !isSummer2026_27 && !isSummer2027_28) return false;
+    if (month0 === 6 && day >= 1 && day <= 30) return false; // Dad: Jul 1-30 → NOT mom
+    return true; // Mom: May 22/Aug 11, May 28/Aug 17, May 25/Aug 10
 }
 
 function generateESPOCalendar(lang) {
