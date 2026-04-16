@@ -208,7 +208,7 @@
                     <div class="legend-item"><div class="legend-color holiday-yellow"></div><span id="legendHoliday">School Break</span></div>
                     <div class="legend-item"><div class="legend-color national-holiday"></div><span id="legendNational">National Holiday</span></div>
                     <div class="legend-item"><div class="legend-color fdmd-pink"></div><span id="legendFDMD">Father's/Mother's Day</span></div>
-                    <div class="legend-item"><div class="legend-color summer-purple"></div><span id="legendSummer">Summer (Dad 30 days)</span></div>
+                    <div class="legend-item"><div class="legend-color summer-purple"></div><span id="legendSummer">Summer (Mom start, Dad Jul 1-30, Mom rest)</span></div>
                 </div>
             </div>
         </div>
@@ -462,7 +462,7 @@ const i18n = {
         standardDad: 'Father: Every Thursday 6:00 PM - 8:00 PM',
         standardMom: 'Mother: All other times (primary residence)',
         extendedTimeTitle: 'Extended Possession (ESPO)',
-        extendedDad: 'Father: 1st/3rd/5th week Thu after school-Sun 6PM (+ Mon AM if school off) + 30 consecutive days in summer (Jul 1-30, default); weeks 2 & 4: every Thu after school (standard SPO). Mother: spring/winter break first half; summer remaining days (Jul 31 + Aug 1-2).',
+        extendedDad: 'Father: 1st/3rd/5th week Thu after school-Sun 6PM (+ Mon AM if school off) + 30 consecutive days in summer (Jul 1-30); weeks 2 & 4: every Thu after school (standard SPO). Mother: spring/winter break first half; summer first part + after Jul 30.',
         extendedMom: 'Mother: Remainder of time',
         holidaysTitle: 'Holiday Schedule',
         holidaysDesc: 'Parents alternate major holidays each year (see §153.314). National holidays marked on calendar in orange.',
@@ -508,7 +508,7 @@ const i18n = {
         standardDad: '父亲:每周四下午 6:00 - 8:00',
         standardMom: '母亲:其他所有时间(主要居住地)',
         extendedTimeTitle: '扩展探视 (ESPO)',
-        extendedDad: '父亲:第1/3/5周周四放学后至周日6点(+周一早如果学校不上课)+夏季30天(默认7月1-30日);第2/4周:每周四放学后(标准SPO).母亲:春假/寒假前半段;暑假剩余天数(7月31日+8月1-2日).',
+        extendedDad: '父亲:第1/3/5周周四放学后至周日6点(+周一早如果学校不上课)+夏季30天(7月1-30日);第2/4周:每周四放学后(标准SPO).母亲:春假/寒假前半段;暑假第一部分+7月30日后剩余天数.',
         extendedMom: '母亲:其余时间',
         holidaysTitle: '节假日安排',
         holidaysDesc: '父母轮流过节(见§153.314)。美国法定节假日用橙色标注。',
@@ -772,62 +772,6 @@ function generateSPOCalendar(lang) {
 // Returns 'dad' or 'mom' for school break days, or 'none' if not a break.
 // Summer: handled via isDadSummerDay / isMomSummerDay (above).
 // Spring/Winter breaks: split evenly. Odd years → Mom first, Dad second. Even years → Dad first, Mom second.
-// Father's Day: 3rd Sunday of June, Dad gets Fri 6pm - Sun 6pm
-function getFathersDayWeekend(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
-    let sundays = 0, thirdSun = null;
-    for (let dd = 1; dd <= 30; dd++) {
-        const dt = new Date(yr, 5, dd);
-        if (dt.getDay() === 0) { sundays++; if (sundays === 3) { thirdSun = dt; break; } }
-    }
-    if (!thirdSun) return false;
-    const fri = new Date(thirdSun); fri.setDate(thirdSun.getDate() - 2);
-    const sun = thirdSun;
-    return d >= new Date(fri.getFullYear(), fri.getMonth(), fri.getDate(), 18, 0, 0) && d <= new Date(sun.getFullYear(), sun.getMonth(), sun.getDate(), 18, 0, 0);
-}
-
-// Mother's Day: 2nd Sunday of May, Mom gets Fri 6pm - Sun 6pm
-function getMothersDayWeekend(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
-    let sundays = 0, secondSun = null;
-    for (let dd = 1; dd <= 31; dd++) {
-        const dt = new Date(yr, 4, dd);
-        if (dt.getMonth() !== 4) break;
-        if (dt.getDay() === 0) { sundays++; if (sundays === 2) { secondSun = dt; break; } }
-    }
-    if (!secondSun) return false;
-    const fri = new Date(secondSun); fri.setDate(secondSun.getDate() - 2);
-    const sun = secondSun;
-    return d >= new Date(fri.getFullYear(), fri.getMonth(), fri.getDate(), 18, 0, 0) && d <= new Date(sun.getFullYear(), sun.getMonth(), sun.getDate(), 18, 0, 0);
-}
-
-// Christmas: even yr Dad Dec18noon-Dec28noon, then Mom; odd yr swap
-function getChristmasCustody(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
-    const winStart = new Date(2026, 11, 18);
-    const winEnd = new Date(2027, 0, 3);
-    if (d < winStart || d > winEnd) return 'none';
-    const isBeforeDec28 = dateStr < '2026-12-28';
-    return isBeforeDec28 ? (yr % 2 === 0 ? 'dad' : 'mom') : (yr % 2 === 0 ? 'mom' : 'dad');
-}
-
-// Thanksgiving: odd yr Dad, even yr Mom
-function getThanksgivingCustody(dateStr) {
-    const d = new Date(dateStr);
-    const yr = d.getFullYear();
-    const tgBreaks = [
-        { start: '2025-11-24', end: '2025-11-30' },
-        { start: '2026-11-23', end: '2026-11-29' }
-    ];
-    for (const tb of tgBreaks) {
-        if (d >= new Date(tb.start) && d <= new Date(tb.end)) return yr % 2 === 1 ? 'dad' : 'mom';
-    }
-    return 'none';
-}
-
 // Father's Day: 3rd Sunday of June, Dad gets Fri-Sat-Sun of that weekend
 function getFathersDayWeekend(dateStr) {
     const yr = new Date(dateStr).getFullYear();
@@ -869,11 +813,14 @@ function getMothersDayWeekend(dateStr) {
 function getChristmasCustody(dateStr) {
     const d = new Date(dateStr);
     const yr = d.getFullYear();
-    const winStart = new Date(2026, 11, 18);
-    const winEnd = new Date(2027, 0, 3);
+    // Christmas season: Dec 18 of yr → Jan 3 of yr+1
+    const winStart = new Date(yr, 11, 18);
+    const winEnd = new Date(yr + 1, 0, 3);
     if (d < winStart || d > winEnd) return 'none';
-    const isBeforeDec28 = dateStr < '2026-12-28';
-    return isBeforeDec28 ? (yr % 2 === 0 ? 'dad' : 'mom') : (yr % 2 === 0 ? 'mom' : 'dad');
+    // Dec 28 inclusive for FIRST parent (split at Dec 28)
+    const dec28 = new Date(yr, 11, 28);
+    if (d <= dec28) return yr % 2 === 0 ? 'dad' : 'mom'; // Dec 18-28
+    return yr % 2 === 0 ? 'mom' : 'dad';                   // Dec 29 - Jan 3
 }
 
 // Thanksgiving: odd yr Dad, even yr Mom
@@ -920,14 +867,18 @@ function getSchoolBreakCustody(dateStr) {
 // Returns true for Mom's designated summer days per Texas §153.317 default.
 // Summer break is May 28 - Aug 16 (RRISD 2025-2026) / May 27 - Aug 15 (RRISD 2026-2027).
 // Dad's 30 days: July 1-30 each year. Mom gets July 31 through day before school starts.
-function isMomSummerDay(day, month, year) {
-    // 2026: school starts Aug 3 → Mom gets July 31, Aug 1, Aug 2
-    if (year === 2026 && month === 6 && day === 31) return true; // July 31
-    if (year === 2026 && month === 7 && day >= 1 && day <= 2) return true; // Aug 1-2
-    // 2027: school starts Aug 16 → Mom gets July 31, Aug 1-15
-    if (year === 2027 && month === 6 && day === 31) return true; // July 31
-    if (year === 2027 && month === 7 && day >= 1 && day <= 15) return true; // Aug 1-15
-    return false;
+function isMomSummerDay(day, month0, year) {
+    // Summer 2026 (May 28-Aug 16): Dad Jul 1-30, Mom rest
+    // Summer 2027 (May 27-Aug 15): Dad Jul 1-30, Mom rest
+    const isSummer2026 = (year === 2026 && month0 === 4 && day >= 28)
+                      || (year === 2026 && month0 === 5)
+                      || (year === 2026 && month0 === 6 && day >= 31);
+    const isSummer2027 = (year === 2027 && month0 === 4 && day >= 27)
+                      || (year === 2027 && month0 === 5)
+                      || (year === 2027 && month0 === 6 && day >= 31);
+    if (!isSummer2026 && !isSummer2027) return false;
+    if (month0 === 6 && day >= 1 && day <= 30) return false; // Dad: Jul 1-30
+    return true; // Mom: summer start→Jun30 + Jul31+→summer end
 }
 
 function generateESPOCalendar(lang) {
@@ -986,12 +937,12 @@ function generateESPOCalendar(lang) {
             const isThuNextMonthWeekend = thursdayOfWeekMonth !== month || thursdayOfWeekYear !== year;
             const isThisDayESPO = (isHoliday && breakCustody !== 'none') ? false : (dowIsESPO && (isThuInESPOSet || isThuNextMonthWeekend));
             const isThuNonESPO = isThursday && !isThisDayESPO && !isSummerBreak && !isHoliday;
-            // Priority ORDER (highest → lowest, §153.314/312):
-            // 1) Father's/Mother's Day weekend (pink) - §153.314(5)(6)
-            // 2) Summer Dad 30 days / Mom remaining
-            // 3) School break (spring: even=Dad whole; winter: halves)
-            // 4) National holidays §153.314 - Thanksgiving/Christmas/NewYear/others
-            // 5) ESPO 1st/3rd/5th weekends + 2nd/4th partial Thu
+            // Priority (highest → lowest):
+            // 1) Father's/Mother's Day (pink)
+            // 2) Summer custody (Dad Jul 1-30 blue; Mom rest purple)
+            // 3) School break custody (spring/winter)
+            // 4) National holidays (Thanksgiving/Christmas)
+            // 5) ESPO base
             const isFD = getFathersDayWeekend(dateStr);
             const isMD = getMothersDayWeekend(dateStr);
             if (isFD || isMD) {
