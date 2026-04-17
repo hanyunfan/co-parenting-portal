@@ -79,11 +79,10 @@
         .cal-day.dad { background: rgba(77,150,255,0.35); border: 1px solid rgba(77,150,255,0.6); }
         .cal-day.dad-partial { background: rgba(77,150,255,0.2); border: 1px dashed rgba(77,150,255,0.5); }
         .cal-day.mom { background: rgba(255,107,107,0.25); }
-        .cal-day.holiday { background: rgba(255,217,61,0.35); }
-        .cal-day.national-holiday { background: rgba(255,165,0,0.4); border: 1px solid rgba(255,165,0,0.7); }
-        .cal-day.summer-dad { background: rgba(155,89,232,0.5); border: 2px solid rgba(155,89,232,0.8); }
-        .cal-day.summer-mom { background: rgba(255,107,107,0.15); }
-        .cal-day.fd-mdspecial { background: rgba(255,105,180,0.5); border: 2px solid rgba(255,105,180,0.9); border-radius: 6px; }
+
+        /* Text highlights for schedule descriptions */
+        .hl-school { background: rgba(255,217,61,0.3); color: #ffd93d; padding: 1px 5px; border-radius: 4px; font-weight: 500; }
+        .hl-national { background: rgba(255,165,0,0.3); color: #ffa500; padding: 1px 5px; border-radius: 4px; font-weight: 500; }
 
         .cal-container { display: block; }
         .disclaimer { background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); border-radius: 8px; padding: 12px; margin-top: 20px; color: #ff8888; font-size: 0.85rem; line-height: 1.6; }
@@ -192,7 +191,7 @@
         <div class="section" id="section-calendar">
             <div class="card">
                 <h2 id="calendarTitle">RRISD Custody Calendars</h2>
-                <p id="calendarSubtitle" style="color:#aaa;margin-bottom:20px;">April 2026 - May 2027 | Blue = Dad | Red = Mom | Yellow = School Break | Orange = National Holiday</p>
+                <p id="calendarSubtitle" style="color:#aaa;margin-bottom:20px;">April 2026 - May 2027 | Blue = Dad | Red = Mom</p>
 
                 <div class="cal-mode-tabs" style="display:flex;gap:10px;margin-bottom:20px;">
                     <button class="nav-tab" id="btnSpo" onclick="showCalMode('spo')" style="min-width:200px;">📅 SPO (Standard)</button>
@@ -205,10 +204,6 @@
                 <div class="legend">
                     <div class="legend-item"><div class="legend-color dad-blue"></div><span id="legendDad">Dad</span></div>
                     <div class="legend-item"><div class="legend-color mom-red"></div><span id="legendMom">Mom</span></div>
-                    <div class="legend-item"><div class="legend-color holiday-yellow"></div><span id="legendHoliday">School Break</span></div>
-                    <div class="legend-item"><div class="legend-color national-holiday"></div><span id="legendNational">National Holiday</span></div>
-                    <div class="legend-item"><div class="legend-color fdmd-pink"></div><span id="legendFDMD">Father's/Mother's Day</span></div>
-                    <div class="legend-item"><div class="legend-color summer-purple"></div><span id="legendSummer">Summer (Mom: day after school ends → Jun 30 + Jul 31 - school resume; Dad: Jul 1-30)</span></div>
                 </div>
             </div>
         </div>
@@ -457,17 +452,17 @@ const i18n = {
         tabSchedule: '📅 Schedule', tabCalendar: '🗓️ Calendar',
         tabExpenses: '💰 Expenses', tabInfo: 'i️ Info',
         scheduleTitle: 'ESPO Custody Schedule',
-        scheduleDesc: 'Extended Standard Possession Order - Texas Family Code §153.317',
+        scheduleDesc: 'Extended Standard Possession Order (ESPO) — Texas Family Code §153.317. <b>School breaks</b> (Summer, Winter, Spring, Fall) and <b>national holidays</b> are split between parents (see details below).',
         standardTimeTitle: 'Standard Possession',
         standardDad: 'Father: Every Thursday 6:00 PM - 8:00 PM',
         standardMom: 'Mother: All other times (primary residence)',
         extendedTimeTitle: 'Extended Possession (ESPO)',
-        extendedDad: 'Father: 1st/3rd/5th week Thu after school-Sun 6PM (+ Mon AM if school off) + 30 consecutive days in summer (Jul 1-30); weeks 2 & 4: every Thu after school (standard SPO). Mother: spring/winter break first half; summer first part + after Jul 30.',
+        extendedDad: 'Father: 1st/3rd/5th week Thu after school-Sun 6PM (+ Mon AM if school off) + 30 consecutive days in summer (Jul 1-30); weeks 2 & 4: every Thu after school (standard SPO). Mother: <span class="hl-school">spring/winter break</span> first half; <span class="hl-school">summer</span> first part + after Jul 30.',
         extendedMom: 'Mother: Remainder of time',
         holidaysTitle: 'Holiday Schedule',
-        holidaysDesc: 'Parents alternate major holidays each year (see §153.314). National holidays marked on calendar in orange.',
+        holidaysDesc: 'Parents alternate <span class="hl-national">major holidays</span> each year (odd=Dad, even=Mom). <span class="hl-national">National holidays</span> (New Year, MLK Day, Presidents Day, Memorial Day, Labor Day, etc.) alternate each year.',
         calendarTitle: 'RRISD Calendar - Custody Schedule',
-        calendarSubtitle: 'April 2026 - May 2027 | Blue = Dad | Red = Mom | Yellow = School Break | Orange = National Holiday',
+        calendarSubtitle: 'April 2026 \u2013 May 2027 | <span class="hl-school">\u25a0 School Break</span> | <span class="hl-national">\u25a0 National Holiday</span> | Blue = Dad | Red = Mom',
         legendDadStd: "Dad: Thu 6-8pm (Standard)", legendDadEspo: "Dad: ESPO (1st/3rd/5th Thu - Mon AM)",
         legendMom: "Mom (primary residence)", legendShared: "School / Shared", legendHoliday: "Holiday / No School",
         expensesTitle: 'Texas Child Support - What\'s Covered',
@@ -503,17 +498,17 @@ const i18n = {
         tabSchedule: '📅 时间表', tabCalendar: '🗓️ 日历',
         tabExpenses: '💰 费用', tabInfo: 'i️ 信息',
         scheduleTitle: 'ESPO 抚养时间表',
-        scheduleDesc: '扩展标准探视令 - 德州家庭法 §153.317',
+        scheduleDesc: '扩展标准探视令 (ESPO) \u2014 德州家庭法 §153.317。<b>学校假期</b>(\u6691\u5047\u3001\u5bd2\u5047\u3001\u6625\u5047\u3001\u79cb\u5047) <b>\u6cd5\u5b9a\u8282\u5047\u65e5</b> \u7531\u7236\u6bcd\u8f6e\u6d41\uff08\u89c1\u4e0b\u65b9\u8be6\u7ec6\u8bf4\u660e\uff09\u3002',
         standardTimeTitle: '标准探视',
         standardDad: '父亲:每周四下午 6:00 - 8:00',
         standardMom: '母亲:其他所有时间(主要居住地)',
         extendedTimeTitle: '扩展探视 (ESPO)',
-        extendedDad: '父亲:第1/3/5周周四放学后至周日6点(+周一早如果学校不上课)+夏季30天(7月1-30日);第2/4周:每周四放学后(标准SPO).母亲:春假/寒假前半段;暑假第一部分+7月30日后剩余天数.',
+        extendedDad: '父亲:第1/3/5周周四放学后至周日6点(+周一早如果学校不上课)+夏季30天(7月1-30日);第2/4周:每周四放学后(标准SPO).母亲:<span class="hl-school">春假/寒假</span>前半段;<span class="hl-school">暑假</span>第一部分+7月30日后剩余天数.',
         extendedMom: '母亲:其余时间',
         holidaysTitle: '节假日安排',
-        holidaysDesc: '父母轮流过节(见§153.314)。美国法定节假日用橙色标注。',
+        holidaysDesc: '父母轮流过<span class="hl-national">主要节日</span>(奇年=爸爸,偶年=妈妈)。<span class="hl-national">美国法定节假日</span>(\u5143\u65e5\u3001\u9a6c\u4e01\u8def\u5fb7\u91d1\u65e5\u3001\u603b\u7edf\u65e5\u3001\u9668\u4ea1\u5c06\u58eb\u7eaa\u5ff5\u65e5\u3001\u52b3\u52a8\u8282\u7b49)每年轮流。',
         calendarTitle: 'RRISD 校历 - 抚养时间表',
-        calendarSubtitle: '2026年4月 - 2027年5月 | 蓝色=爸爸 | 红色=妈妈 | 黄色=学校假期 | 橙色=美国法定节假日',
+        calendarSubtitle: '2026\u5e744\u6708 \u2013 2027\u5e745\u6708 | <span class="hl-school">\u25a0 \u5b66\u6821\u5047\u671f</span> | <span class="hl-national">\u25a0 \u6cd5\u5b9a\u8282\u65e5</span> | \u84dd\u8272=爸爸 | \u7ea2\u8272=妈妈',
         legendDadStd: "爸爸:周四6-8点(标准)", legendDadEspo: "爸爸:ESPO(第1/3/5周周四+周日)",
         legendMom: "妈妈(主要居住地)", legendShared: "学校/共享", legendHoliday: "放假/不上课",
         expensesTitle: '德州子女抚养费 - 涵盖项目',
@@ -763,11 +758,27 @@ function generateSPOCalendar(lang) {
             // Summer break: SPO suspended, regular schedule pauses; treat as holiday/break period
             const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
             if (isHoliday) {
-                dayDiv.classList.add('holiday');
+                // Apply custody split to school break days (mom first half, dad second half)
+                const bc = getSchoolBreakCustody(dateStr);
+                dayDiv.classList.add(bc === 'mom' ? 'mom' : 'dad');
                 labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
             } else if (natHoliday) {
-                dayDiv.classList.add('national-holiday');
-                labelDiv.textContent = natHoliday[lang] || natHoliday.en;
+                // National holidays: use alternating schedule
+                const tg = getThanksgivingCustody(dateStr);
+                const xm = getChristmasCustody(dateStr);
+                const yr = new Date(dateStr).getFullYear();
+                const isOdd = yr % 2 === 1;
+                if (tg !== 'none') {
+                    dayDiv.classList.add(tg === 'mom' ? 'mom' : 'dad');
+                    labelDiv.textContent = natHoliday[lang] || natHoliday.en;
+                } else if (xm !== 'none') {
+                    dayDiv.classList.add(xm === 'mom' ? 'mom' : 'dad');
+                    labelDiv.textContent = natHoliday[lang] || natHoliday.en;
+                } else {
+                    // Other national holidays: odd=Dad, even=Mom
+                    dayDiv.classList.add(isOdd ? 'dad' : 'mom');
+                    labelDiv.textContent = natHoliday[lang] || natHoliday.en;
+                }
             } else if (isThursday && !isSummerBreak) {
                 dayDiv.classList.add('dad');
                 labelDiv.textContent = lang === 'cn' ? '爸爸6-8pm' : 'Dad 6-8pm';
@@ -1000,16 +1011,25 @@ function generateESPOCalendar(lang) {
             // 5) ESPO base
             const isFD = getFathersDayWeekend(dateStr);
             const isMD = getMothersDayWeekend(dateStr);
-            if (isFD || isMD) {
-                dayDiv.classList.add('fd-mdspecial');
-                labelDiv.textContent = isFD
+            const yr = new Date(dateStr).getFullYear();
+            const isOdd = yr % 2 === 1;
+            if (isFD) {
+                // Dad gets Father's Day in odd years; Mom in even years
+                dayDiv.classList.add(isOdd ? 'dad' : 'mom');
+                labelDiv.textContent = isOdd
                     ? (lang === 'cn' ? '爸爸(父亲节!)' : 'Dad-FD')
-                    : (lang === 'cn' ? '妈妈(母亲节!)' : 'Mom-MD');
+                    : (lang === 'cn' ? '妈妈(父亲节!)' : 'Mom-FD');
+            } else if (isMD) {
+                // Mom gets Mother's Day in even years; Dad in odd years
+                dayDiv.classList.add(isOdd ? 'dad' : 'mom');
+                labelDiv.textContent = !isOdd
+                    ? (lang === 'cn' ? '妈妈(母亲节!)' : 'Mom-MD')
+                    : (lang === 'cn' ? '爸爸(母亲节!)' : 'Dad-MD');
             } else if (isDadSummerDay) {
-                dayDiv.classList.add('summer-dad');
+                dayDiv.classList.add('dad');
                 labelDiv.textContent = lang === 'cn' ? '爸爸(暑假30天)' : 'Dad-Sum';
             } else if (isMomSummerDay_val) {
-                dayDiv.classList.add('summer-mom');
+                dayDiv.classList.add('mom');
                 labelDiv.textContent = lang === 'cn' ? '妈妈(暑假剩余)' : 'Mom-Sum';
             } else if (isHoliday) {
                 dayDiv.classList.add(breakCustody === 'mom' ? 'mom' : 'dad');
@@ -1027,7 +1047,8 @@ function generateESPOCalendar(lang) {
                     labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
                 }
             } else if (natHoliday) {
-                dayDiv.classList.add('national-holiday');
+                // Other national holidays: odd=Dad, even=Mom
+                dayDiv.classList.add(isOdd ? 'dad' : 'mom');
                 labelDiv.textContent = natHoliday[lang] || natHoliday.en;
             } else if (isThisDayESPO) {
                 dayDiv.classList.add('dad');
@@ -1062,17 +1083,17 @@ function setLanguage(lang) {
     document.getElementById('tabExpenses').textContent = t.tabExpenses;
     document.getElementById('tabInfo').textContent = t.tabInfo;
     document.getElementById('scheduleTitle').textContent = t.scheduleTitle;
-    document.getElementById('scheduleDesc').textContent = t.scheduleDesc;
+    document.getElementById('scheduleDesc').innerHTML = t.scheduleDesc;
     document.getElementById('standardTimeTitle').textContent = t.standardTimeTitle;
     document.getElementById('standardDad').textContent = t.standardDad;
     document.getElementById('standardMom').textContent = t.standardMom;
     document.getElementById('extendedTimeTitle').textContent = t.extendedTimeTitle;
-    document.getElementById('extendedDad').textContent = t.extendedDad;
+    document.getElementById('extendedDad').innerHTML = t.extendedDad;
     document.getElementById('extendedMom').textContent = t.extendedMom;
     document.getElementById('holidaysTitle').textContent = t.holidaysTitle;
-    document.getElementById('holidaysDesc').textContent = t.holidaysDesc;
+    document.getElementById('holidaysDesc').innerHTML = t.holidaysDesc;
     document.getElementById('calendarTitle').textContent = t.calendarTitle;
-    document.getElementById('calendarSubtitle').textContent = t.calendarSubtitle;
+    document.getElementById('calendarSubtitle').innerHTML = t.calendarSubtitle;
     // Legend uses static text
     document.getElementById('expensesTitle').textContent = t.expensesTitle;
     document.getElementById('expensesDesc').textContent = t.expensesDesc;
