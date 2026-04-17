@@ -83,6 +83,7 @@
         /* Text highlights for schedule descriptions */
         .hl-school { background: rgba(255,217,61,0.3); color: #ffd93d; padding: 1px 5px; border-radius: 4px; font-weight: 500; }
         .hl-national { background: rgba(255,165,0,0.3); color: #ffa500; padding: 1px 5px; border-radius: 4px; font-weight: 500; }
+        .cal-day.uncertain-break { border: 2px dashed rgba(255,255,255,0.3); background: rgba(255,255,255,0.05); }
 
         .cal-container { display: block; }
         .disclaimer { background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.3); border-radius: 8px; padding: 12px; margin-top: 20px; color: #ff8888; font-size: 0.85rem; line-height: 1.6; }
@@ -631,15 +632,17 @@ const schoolBreaks = [
     // Summer Break: May 28 - Aug 16 2027 (school resumes Aug 17)
     { start: '2027-05-28', end: '2027-08-16', label: { en: 'Summer Break', cn: '暑假' } },
 
-    // ===== RISD 2027-2028 =====  (estimated - board approved Rev 6.24.25)
+    // ===== RISD 2027-2028 =====  (estimated - board approved Rev 6.24.25; first/last day TBD from PDF)
     // Fall/Thanksgiving Break: estimated Mon Nov 22 - Fri Nov 26 2027
     { start: '2027-11-22', end: '2027-11-26', label: { en: 'Fall Break', cn: '秋假' } },
     // Winter Break: estimated Dec 20 2027 - Jan 4 2028 (school resumes Jan 5)
     { start: '2027-12-20', end: '2028-01-04', label: { en: 'Winter Break', cn: '寒假' } },
     // Spring Break: estimated Mar 13-17 2028
     { start: '2028-03-13', end: '2028-03-17', label: { en: 'Spring Break', cn: '春假' } },
-    // Summer Break: May 25 - Aug 15 2028 (estimated; school resumes Aug 16)
-    { start: '2028-05-25', end: '2028-08-15', label: { en: 'Summer Break', cn: '暑假' } },
+    // Summer Break: May 25 - Aug XX 2028 (first day & summer end TBD - RISD hasn't published exact dates)
+    // The exact school start date in Aug is needed to determine Mom's last summer day.
+    // Dad's 30 days (Jul 1-30) are unaffected by the unknown end date.
+    { start: '2028-05-25', end: '2028-08-15', label: { en: 'Summer Break (TBD)', cn: '暑假(待定)' }, uncertain: true },
 ];
 
 function isSchoolBreak(dateStr) {
@@ -755,13 +758,19 @@ function generateSPOCalendar(lang) {
             const isHoliday = breakInfo !== null;
             const natHoliday = getNationalHolidayLabel(year, month, d);
             const isThursday = dow === 4;
-            // Summer break: SPO suspended, regular schedule pauses; treat as holiday/break period
-            const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
+            // Summer break: SPO suspended during confirmed summer break
+            const isSummerBreak = breakInfo && (breakInfo.label.en.startsWith('Summer Break') || breakInfo.label.cn.startsWith('暑假'));
             if (isHoliday) {
-                // Apply custody split to school break days (mom first half, dad second half)
-                const bc = getSchoolBreakCustody(dateStr);
-                dayDiv.classList.add(bc === 'mom' ? 'mom' : 'dad');
-                labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
+                if (breakInfo.uncertain) {
+                    // Unconfirmed school break dates: show label only, no custody color
+                    dayDiv.classList.add('uncertain-break');
+                    labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
+                } else {
+                    // Apply custody split to confirmed school break days
+                    const bc = getSchoolBreakCustody(dateStr);
+                    dayDiv.classList.add(bc === 'mom' ? 'mom' : 'dad');
+                    labelDiv.textContent = (breakInfo.label[lang] || breakInfo.label.en);
+                }
             } else if (natHoliday) {
                 // National holidays: use alternating schedule
                 const tg = getThanksgivingCustody(dateStr);
@@ -937,11 +946,8 @@ function isMomSummerDay(day, month0, year) {
      || (year === 2027 && month0 === 5)               // all June
      || (year === 2027 && month0 === 6 && day >= 31)  // July 31
      || (year === 2027 && month0 === 7 && day <= 16); // Aug 1-17
-    const isSummer2027_28 =
-        (year === 2028 && month0 === 4 && day >= 25)  // May 25-31
-     || (year === 2028 && month0 === 5)               // all June
-     || (year === 2028 && month0 === 6 && day >= 31)  // July 31
-     || (year === 2028 && month0 === 7 && day <= 10); // Aug 1-10
+    // 2027-28: skip — summer end date unknown (RISD hasn't confirmed first day in Aug)
+    const isSummer2027_28 = false;
     if (!isSummer2025_26 && !isSummer2026_27 && !isSummer2027_28) return false;
     if (month0 === 6 && day >= 1 && day <= 30) return false; // Dad: Jul 1-30 → NOT mom
     return true; // Mom: May 22/Aug 11, May 28/Aug 17, May 25/Aug 10
@@ -980,11 +986,14 @@ function generateESPOCalendar(lang) {
             const natHoliday = getNationalHolidayLabel(year, month, d);
             const isThursday = dow === 4, isFriday = dow === 5, isSaturday = dow === 6, isSunday = dow === 0;
             // Summer break: ESPO pauses, Dad gets 30 consecutive days (July 1-30)
-            const isSummerBreak = breakInfo && (breakInfo.label.en === 'Summer Break' || breakInfo.label.cn === '暑假');
-            const isDadSummerDay = isSummerBreak && (month === 6 && d >= 1 && d <= 30);
-            const isMomSummerDay_val = isSummerBreak && isMomSummerDay(d, month, year);
+            // Mom's remaining summer days are only applicable for confirmed school years (not 2027-28 TBD)
+            const isSummerBreak = breakInfo && (breakInfo.label.en.startsWith('Summer Break') || breakInfo.label.cn.startsWith('暑假'));
+            const isUncertainSummer = isSummerBreak && breakInfo.uncertain;
+            const isDadSummerDay = isSummerBreak && !isUncertainSummer && (month === 6 && d >= 1 && d <= 30);
+            const isMomSummerDay_val = isSummerBreak && !isUncertainSummer && isMomSummerDay(d, month, year);
             // School break custody: Mom first half, Dad second half (overrides ESPO)
-            const breakCustody = isHoliday ? getSchoolBreakCustody(dateStr) : 'none';
+            // Skip custody assignment for uncertain/unconfirmed breaks (dates not confirmed by school district)
+            const breakCustody = isHoliday && !isUncertainSummer ? getSchoolBreakCustody(dateStr) : 'none';
             // This day's weekend is ESPO if:
             //   - It is Thu/Fri/Sat/Sun AND its Thursday is in espothuSet (1st/3rd/5th Thu of month)
             //   - OR its Thursday belongs to Weekend 1 of NEXT month (e.g. Apr 30)
