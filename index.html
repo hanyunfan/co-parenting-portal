@@ -1129,9 +1129,6 @@ function setLanguage(lang) {
     document.getElementById('btnEspo').textContent = (lang === 'cn' ? '🌟 ESPO 扩展探视' : '🌟 ESPO (Extended)');
     document.getElementById('legendDad').textContent = (lang === 'cn' ? '爸爸' : 'Dad');
     document.getElementById('legendMom').textContent = (lang === 'cn' ? '妈妈' : 'Mom');
-    document.getElementById('legendHoliday').textContent = (lang === 'cn' ? '学校假期' : 'School Break');
-    document.getElementById('legendNational').textContent = (lang === 'cn' ? '美国法定节假日' : 'National Holiday');
-    document.getElementById('legendSummer').textContent = (lang === 'cn' ? '夏季(爸爸30天)' : 'Summer (Dad 30 days)');
 
     generateSPOCalendar(lang);
     generateESPOCalendar(lang);
