@@ -3,7 +3,7 @@
   "schoolYears": [
     {
       "year": "2025-2026",
-      "start": "2025-08-13",
+      "start": "2025-08-18",
       "end": "2026-05-21",
       "breaks": {
         "thanksgiving": {
@@ -36,6 +36,14 @@
           "label": {
             "en": "Summer Break",
             "cn": "暑假"
+          }
+        },
+        "summer_pre_school": {
+          "start": "2025-05-22",
+          "end": "2025-08-17",
+          "label": {
+            "en": "Pre-School Summer",
+            "cn": ""
           }
         }
       },

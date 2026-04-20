@@ -171,9 +171,11 @@ class DataNormalizer:
 
     def _adjust_summer_breaks(self) -> None:
         """
-        Extend each school year's summer break to end the day before the next
-        school year starts. This ensures days between school years (including
-        Aug 12-17 when school hasn't started yet) are treated as summer.
+        Ensure summer break covers all days between the end of one school year
+        and the start of the next (including Aug 13-17 teacher work days).
+        For each school year:
+          - summer.start = day after previous school year ended (or May 22 default)
+          - summer.end = day before THIS school year starts (so Aug 13-17 = summer)
         """
         from datetime import date as date_cls, timedelta
         school_years = self._data.get("schoolYears", [])
@@ -181,17 +183,27 @@ class DataNormalizer:
             if "summer" not in sy.get("breaks", {}):
                 continue
 
-            # Find next school year
-            next_sy = None
-            for j, sy2 in enumerate(school_years):
-                if j > i:
-                    next_sy = sy2
-                    break
+            sy_start = date_cls.fromisoformat(sy["start"])
 
-            if next_sy:
-                next_start = date_cls.fromisoformat(next_sy["start"])
-                last_summer_day = next_start - timedelta(days=1)
-                sy["breaks"]["summer"]["end"] = last_summer_day.isoformat()
+            # Find previous school year to know when last one ended
+            prev_sy_end = None
+            for j in range(i - 1, -1, -1):
+                prev_sy_end = date_cls.fromisoformat(school_years[j]["end"])
+                break
+
+            if prev_sy_end:
+                # Summer starts the day after the previous school year ended
+                new_summer_start = prev_sy_end + timedelta(days=1)
+            else:
+                # First school year: default to May 22
+                new_summer_start = date_cls(sy_start.year - 1, 5, 22)
+
+            # Summer ends the day before THIS school year starts
+            # (so Aug 13-17 teacher days are treated as summer)
+            last_summer_day = sy_start - timedelta(days=1)
+
+            sy["breaks"]["summer"]["start"] = new_summer_start.isoformat()
+            sy["breaks"]["summer"]["end"] = last_summer_day.isoformat()
 
     def save(self, filename: Optional[str] = None) -> str:
         """Save to processed/ directory. Returns saved path."""
