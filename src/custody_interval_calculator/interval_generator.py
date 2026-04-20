@@ -163,11 +163,14 @@ class CustodyIntervalGenerator:
         start_d = date.fromisoformat(br.start)
         end_d = date.fromisoformat(br.end)
         h_rules = self.rules.get("holidays", {}).get("thanksgiving", {})
-        split = h_rules.get("split", "whole")
-        if split == "whole":
-            parent = h_rules.get("odd_year_parent" if self._is_odd_year(start_d) else "even_year_parent", "dad")
-            return [CustodyInterval(start_d, end_d, parent, "thanksgiving")]
-        return []
+        # Per §153.314(3): Odd year = possessory conservator (Dad) gets WHOLE period
+        #                 Even year = managing conservator (Mom) gets whole period
+        # Period: 6pm day school dismissed before Thanksgiving → 6pm following Sunday
+        if self._is_odd_year(start_d):
+            parent = h_rules.get("odd_year_parent", "dad")
+        else:
+            parent = h_rules.get("even_year_parent", "mom")
+        return [CustodyInterval(start_d, end_d, parent, "thanksgiving")]
 
     def _christmas_intervals(self, sy: SchoolYear):
         """
@@ -184,8 +187,10 @@ class CustodyIntervalGenerator:
             split_date = start_d + timedelta(days=(end_d - start_d).days // 2)
         calendar_year = start_d.year
         is_even = calendar_year % 2 == 0
-        first_parent = "dad" if is_even else "mom"
-        second_parent = "mom" if is_even else "dad"
+        # Per §153.314 / AG rules: odd year = Dad first half, even year = Mom first half
+        # is_odd_year means odd calendar year of the break START
+        first_parent = "mom" if is_even else "dad"  # mom in even years, dad in odd years
+        second_parent = "dad" if is_even else "mom"
         return [
             CustodyInterval(start_d, split_date, first_parent, "christmas_first_half"),
             CustodyInterval(split_date + timedelta(days=1), end_d, second_parent, "christmas_second_half"),
