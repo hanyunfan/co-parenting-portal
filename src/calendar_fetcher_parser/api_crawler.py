@@ -16,12 +16,16 @@ RAW_DATA_DIR = os.path.join(
 
 def fetch_ics(url: str, dest_path: str) -> bool:
     """Download an ICS file from URL."""
+    import ssl
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0",
         "Accept": "text/calendar,*/*"
     })
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
             content = resp.read().decode("utf-8", errors="ignore")
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
         with open(dest_path, "w", encoding="utf-8") as f:
@@ -58,11 +62,15 @@ def parse_ics_events(content: str) -> list[dict]:
 
 def fetch_web_page(url: str, dest_path: str) -> bool:
     """Fetch a web page and save raw HTML."""
+    import ssl
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     })
     try:
-        with urllib.request.urlopen(req, timeout=15) as resp:
+        with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
             content = resp.read().decode("utf-8", errors="ignore")
         os.makedirs(os.path.dirname(dest_path), exist_ok=True)
         with open(dest_path, "w", encoding="utf-8") as f:

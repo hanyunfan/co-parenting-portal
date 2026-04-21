@@ -71,19 +71,32 @@ def _parse_ics(path: str) -> dict:
     }
 
 
+def _parse_html_file(path: str) -> dict:
+    """Parse an HTML file as a calendar page."""
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        content = f.read()
+
+    save_source_meta(path, "html", path, True)
+    return parse_html_calendar_dates(content)
+
+
 def _parse_pdf(path: str) -> dict:
-    """Parse PDF using pdfplumber."""
+    """Parse PDF using pdfplumber. Falls back to HTML parsing if not a real PDF."""
     try:
         import pdfplumber
     except ImportError:
         return {"error": "pdfplumber not installed: pip install pdfplumber"}
 
-    text = ""
-    with pdfplumber.open(path) as pdf:
-        for page in pdf.pages:
-            t = page.extract_text()
-            if t:
-                text += t + "\n"
+    try:
+        with pdfplumber.open(path) as pdf:
+            text = ""
+            for page in pdf.pages:
+                t = page.extract_text()
+                if t:
+                    text += t + "\n"
+    except Exception as pdf_err:
+        # Not a real PDF (e.g., saved as .pdf but actually HTML) — parse as HTML
+        return _parse_html_file(path)
 
     from .web_page_parser import extract_from_raw_text
     result = extract_from_raw_text(text)

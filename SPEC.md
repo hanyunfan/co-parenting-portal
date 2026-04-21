@@ -243,9 +243,13 @@ Priority order (checked top to bottom each day):
 3. Regular school day rules: Thursday (dad), 1st/3rd/5th Friday (dad)
 4. Fallback: managing conservator (mom)
 
-For each day in `[school_year_start, school_year_end]`:
+**Summer = day after school ends through the day before school starts again.**
+Pre-instruction days (e.g., Aug 13-17, 2025: teachers report, students don't) are
+treated as summer because kids are not yet in school.
+
+For each day in `[May 22 two years prior through latest school year end]`:
 1. Is it Fathers Day or Mothers Day weekend? → that parent
-2. Is it in a break? → apply break rule (thanksgiving, christmas, spring, summer)
+2. Is it in a break (including pre-school summer gap)? → apply break rule
 3. Is it a regular school day?
    - Thursday → dad
    - 1st/3rd/5th Friday? → dad
@@ -269,7 +273,7 @@ For each day in `[school_year_start, school_year_end]`:
 - [x] Christmas 2026 Dec 18-28 → Mom (even year, first half)
 - [x] Spring Break 2026 (even year) → Dad
 - [x] Summer: July 1-30 → Dad, July 31+ → Mom
-- [x] Aug 13-17, 2025 (pre-school, not in any break) → Mom (default)
+- [x] Aug 13-17, 2025 (pre-school summer gap) → Mom (summer_remainder)
 - [x] Father's Day 2026 → Dad (overrides summer break)
 - [x] Mother's Day 2026 → Mom
 - [x] ESPO Thursday intervals → Dad
